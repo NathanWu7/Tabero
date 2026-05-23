@@ -1,5 +1,7 @@
 ## OpenPI（TacManip）推理指南（傻瓜版）
 
+[English](OPENPI.md) | 中文
+
 这个目录包含 OpenPI 的 **推理客户端** 与相关工具，用于在 Isaac Lab 环境里跑闭环推理评估。
 
 你需要搞清楚两件事：

@@ -1,5 +1,7 @@
 ## Benchmarks（数据介绍 / 转换 / OpenPI）
 
+[English](BENCHMARKS.md) | 中文
+
 本目录主要包含三件事：
 
 - **数据（datasets）**：Libero 原始数据、Tabero/Tabero-force 数据组织、以及转换后的 LeRobot（pi0/OpenPI）格式数据
@@ -7,7 +9,7 @@
 - **OpenPI（openpi）**：推理客户端（client）与调试可视化工具
 
 更细的“采集/回放/评估脚本逻辑”请看：
-- `scripts/tools/README.md`
+- [Tools 文档](TOOLS.zh-CN.md)
 
 ---
 
@@ -22,7 +24,7 @@
 - **`copy/`**：打包好的示例数据（zip、视频等）
 
 > 注意：本仓库的数据采集主线是 “`assembled_hdf5` → Isaac 回放再采集 → `replayed_demos` + `video_datasets`”。  
-> 这一步在 `scripts/tools/` 完成（见 `scripts/tools/README.md`），benchmarks 侧主要负责**转换**和 **OpenPI**。
+> 这一步由 `scripts/tools/` 下的脚本完成（见 [Tools 文档](TOOLS.zh-CN.md)），benchmarks 侧主要负责**转换**和 **OpenPI**。
 
 #### 1.2 `benchmarks/datasets/tabero/` 与 `benchmarks/datasets/tabero_force/`
 
@@ -151,7 +153,7 @@ OpenPI 分两部分：
 - **OpenPI server**：外部服务（TacManip 仓库外启动）
 - **TacManip client**：本仓库的 `benchmarks/openpi/openpi_inference_client.py`
 
-详细推理说明见：`benchmarks/openpi/README.md`（此处只写安装与最常用入口）。
+详细推理说明见：[OpenPI 推理文档](OPENPI.zh-CN.md)（此处只写安装与最常用入口）。
 
 #### 3.1 安装 openpi client（本仓库侧）
 
