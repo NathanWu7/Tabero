@@ -41,15 +41,30 @@ python -m pip install -e benchmarks/openpi/openpi-client
 从 [`NathanWu7/Isaaclab_Libero`](https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero) 下载 LIBERO 数据。本仓库至少需要其中的 `assembled_hdf5/` 和 `USD/`；如果直接训练或推理，也可以使用预处理好的 `replayed_demos/` 和 `video_datasets/`。
 
 ```bash
-huggingface-cli download NathanWu7/Isaaclab_Libero \
+hf download NathanWu7/Isaaclab_Libero \
   --repo-type dataset \
   --local-dir /path/to/Isaaclab_Libero
 ```
 
-准备默认 LIBERO 数据软链接：
+准备默认 LIBERO 数据软链接。保留本仓库中的 `benchmarks/datasets/libero/config` 和 `benchmarks/datasets/libero/utils`；只把下载数据里的子目录链接进来。
 
 ```bash
-ln -sfn /path/to/Isaaclab_Libero benchmarks/datasets/libero
+LIBERO_DATA=/path/to/Isaaclab_Libero
+
+ln -sfn "$LIBERO_DATA/assembled_hdf5" benchmarks/datasets/libero/assembled_hdf5
+ln -sfn "$LIBERO_DATA/USD" benchmarks/datasets/libero/USD
+
+# 可选：如果你直接使用预处理好的 replay/video 数据，可以一并链接。
+ln -sfn "$LIBERO_DATA/replayed_demos" benchmarks/datasets/libero/replayed_demos
+ln -sfn "$LIBERO_DATA/video_datasets" benchmarks/datasets/libero/video_datasets
+```
+
+检查 LIBERO 软链接：
+
+```bash
+ls -l benchmarks/datasets/libero
+test -d benchmarks/datasets/libero/assembled_hdf5
+test -d benchmarks/datasets/libero/USD
 ```
 
 使用触觉环境时，从 [`china-sae-robotics/Tactile_Manipulation_Dataset`](https://huggingface.co/datasets/china-sae-robotics/Tactile_Manipulation_Dataset) 下载触觉标定资源：

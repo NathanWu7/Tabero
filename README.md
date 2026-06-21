@@ -41,15 +41,30 @@ python -m pip install -e benchmarks/openpi/openpi-client
 Download the LIBERO data from [`NathanWu7/Isaaclab_Libero`](https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero). The repository expects at least `assembled_hdf5/` and `USD/`; preprocessed `replayed_demos/` and `video_datasets/` can also be used directly for training or inference.
 
 ```bash
-huggingface-cli download NathanWu7/Isaaclab_Libero \
+hf download NathanWu7/Isaaclab_Libero \
   --repo-type dataset \
   --local-dir /path/to/Isaaclab_Libero
 ```
 
-Prepare the default LIBERO data symlink:
+Prepare the default LIBERO data symlinks. Keep `benchmarks/datasets/libero/config` and `benchmarks/datasets/libero/utils` from this repository; only link the downloaded data subdirectories.
 
 ```bash
-ln -sfn /path/to/Isaaclab_Libero benchmarks/datasets/libero
+LIBERO_DATA=/path/to/Isaaclab_Libero
+
+ln -sfn "$LIBERO_DATA/assembled_hdf5" benchmarks/datasets/libero/assembled_hdf5
+ln -sfn "$LIBERO_DATA/USD" benchmarks/datasets/libero/USD
+
+# Optional, useful if you use preprocessed replay/video data directly.
+ln -sfn "$LIBERO_DATA/replayed_demos" benchmarks/datasets/libero/replayed_demos
+ln -sfn "$LIBERO_DATA/video_datasets" benchmarks/datasets/libero/video_datasets
+```
+
+Verify the LIBERO links:
+
+```bash
+ls -l benchmarks/datasets/libero
+test -d benchmarks/datasets/libero/assembled_hdf5
+test -d benchmarks/datasets/libero/USD
 ```
 
 Download the tactile calibration assets from [`china-sae-robotics/Tactile_Manipulation_Dataset`](https://huggingface.co/datasets/china-sae-robotics/Tactile_Manipulation_Dataset) when using tactile environments:
