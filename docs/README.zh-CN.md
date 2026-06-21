@@ -68,6 +68,19 @@ ln -sfn /path/to/Tactile_manipulation_dataset source/tac_manip/tac_manip/assets/
 
 如果要重新 replay 采集，请把输出目录单独指定到默认数据软链接之外。完整说明见 [Isaac-Libero 使用手册](LIBERO_WORKFLOW.md) 和 [Tools 工具脚本文档](TOOLS.zh-CN.md)。
 
+## 模型代码与权重
+
+Tabero 对应的 OpenPI 侧模型代码维护在 [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA)。该仓库负责模型训练/推理服务侧；TacManip 负责 Isaac Lab 环境、数据转换工具和推理 client。
+
+对应模型权重位于 [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero)：
+
+```bash
+hf download NathanWu7/pi0_lora_tacfield_tabero \
+  --local-dir /path/to/pi0_lora_tacfield_tabero
+```
+
+闭环评测时，先在模型代码仓库侧启动模型服务，再运行 TacManip 中的 `benchmarks/openpi/openpi_inference_client.py` 或 `scripts/tools/run_task_evaluations.py` 作为 Isaac 侧 client。
+
 ## 主流程
 
 可以选择跑 **Isaac-Libero** 或 **Tabero** 两条路线：

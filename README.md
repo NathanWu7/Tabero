@@ -68,6 +68,19 @@ ln -sfn /path/to/Tactile_manipulation_dataset source/tac_manip/tac_manip/assets/
 
 For replay recollection, use separate output directories instead of writing back to the default symlinked dataset path. See the [Isaac-Libero workflow](docs/LIBERO_WORKFLOW.en.md) and [Tools guide](docs/TOOLS.md).
 
+## Model Code and Weights
+
+The OpenPI-side model code for Tabero is maintained in [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA). This repository provides the model-serving/training side; TacManip provides the Isaac Lab environments, data conversion tools, and inference client.
+
+The corresponding model weights are available at [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero):
+
+```bash
+hf download NathanWu7/pi0_lora_tacfield_tabero \
+  --local-dir /path/to/pi0_lora_tacfield_tabero
+```
+
+During closed-loop evaluation, start the model service from the model-code repository, then run TacManip's `benchmarks/openpi/openpi_inference_client.py` or `scripts/tools/run_task_evaluations.py` as the Isaac-side client.
+
 ## Main Workflows
 
 You can choose either the **Isaac-Libero** path or the **Tabero** path:
