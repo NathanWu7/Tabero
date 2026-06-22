@@ -1,4 +1,4 @@
-## Tools（统一工具说明：收集 / 测试 / 可视化）
+# Tools（统一工具说明：收集 / 测试 / 可视化）
 
 [English](TOOLS.md) | 中文
 
@@ -12,9 +12,9 @@
 
 ---
 
-### 通用约定（强烈建议先看）
+## 通用约定（强烈建议先看）
 
-#### 1）统一路径/环境变量约定（避免把输入输出搞混）
+### 1）统一路径/环境变量约定（避免把输入输出搞混）
 
 - **输入：开源轨迹源（assembled）**
   - `HDF5_TRAJ_SOURCE_DIR=/path/to/libero/assembled_hdf5`
@@ -30,13 +30,13 @@
 
 建议：**不要把输入目录和输出目录指向同一个位置**。
 
-#### 2）批跑逻辑（重要）
+### 2）批跑逻辑（重要）
 
 - `replay_demos_with_camera.py` / `replay_demos.py`：当你传了多个 `--task_suite`，或只传 `--task_suite` 不传 `--task_id` 时，会**通过子进程**逐个 (suite, task_id) 调用自己，避免单进程反复重建 Isaac/Kit 导致不稳定。
 - `run_data_evaluations.py`：会对每个 task 反复调用 `replay_demos.py`（子进程），解析 stdout 统计 success/metrics，直到累计 episode 达到 `max_episodes`。
 - `run_task_evaluations.py`：会对每个 task 调用 OpenPI（或其它 policy）推理脚本（子进程），解析 stdout 得到成功率与力学指标。
 
-#### 3）“精简指令 vs 全指令”怎么理解
+### 3）“精简指令 vs 全指令”怎么理解
 
 - **精简指令**：最少参数、适合快速跑通（默认依赖当前 shell 的环境变量/默认值）
 - **全指令**：把关键环境变量、输出路径、与常用可选参数都显式写出来，便于复现与团队协作
@@ -78,7 +78,14 @@ export USE_TABERO_TASKS=0
 精简指令（来自你最近的实际运行方式）：
 
 ```bash
-python scripts/tools/replay_demos_with_camera.py --task Isaac-Libero-Franka-Replay-Camera-Tactile-v0 --task_suite libero_goal --task_id 2 --dump_data --recorder_type 7dpf --video
+python scripts/tools/replay_demos_with_camera.py \
+  --task Isaac-Libero-Franka-Replay-Camera-Tactile-v0 \
+  --task_suite libero_goal \
+  --task_id 2 \
+  --dump_data \
+  --recorder_type 7dpf \
+  --video \
+  --headless
 ```
 
 全指令（推荐模板：路径与关键参数都写清楚）：
@@ -107,16 +114,27 @@ python scripts/tools/replay_demos_with_camera.py \
 ### `record_demos.py`（手动遥操作录制）
 
 - **作用**：用键盘/SpaceMouse 等遥操作设备录制 demo，输出一个 HDF5。
+- **注意**：LIBERO 任务如果传了 `--task_suite` / `--task_id`，需要先设置 `HDF5_TRAJ_SOURCE_DIR`。`spacemouse` 还要求本机连接了 SpaceMouse；没有设备时请改用 `--teleop_device keyboard`。
 
 精简指令（最小可用，避免默认无限录制）：
 
 ```bash
-python scripts/tools/record_demos.py --task Isaac-Libero-Franka-IK-v0 --num_demos 1 --dataset_file ./output/manual_demo.hdf5
+source scripts/tools/set_replay_env.sh inference
+
+python scripts/tools/record_demos.py \
+  --task Isaac-Libero-Franka-IK-v0 \
+  --task_suite libero_goal \
+  --task_id 1 \
+  --teleop_device keyboard \
+  --num_demos 1 \
+  --dataset_file ./output/manual_demo.hdf5
 ```
 
 全指令（常用模板：明确 teleop 设备、任务选择与输出）：
 
 ```bash
+source scripts/tools/set_replay_env.sh inference
+
 python scripts/tools/record_demos.py \
   --task Isaac-Libero-Franka-IK-v0 \
   --task_suite libero_goal \
@@ -217,7 +235,7 @@ python scripts/tools/run_task_evaluations.py --policy_model openpi --control_mod
 python scripts/tools/run_task_evaluations.py \
   --policy_model openpi \
   --control_mode tactile \
-  --server_host 127.0.0.1 \
+  --server_host 127.0.1.1 \
   --server_port 8000 \
   --task_suites libero_goal libero_10 \
   --task_ids 0 1 2 \
@@ -260,46 +278,6 @@ python scripts/tools/raw_data_retention_analysis.py \
 
 ## （3）可视化和其他工具
 
-### `visualize_lerobot_dataset.py`（快速预览 LeRobot 数据集）
-
-- **作用**：快速播放某个 episode，自动识别 image keys；也支持导出 mp4。
-
-精简指令：
-
-```bash
-python scripts/tools/visualize_lerobot_dataset.py --root /path/to/lerobot_dataset_root
-```
-
-全指令（显式指定 keys + 导出视频）：
-
-```bash
-python scripts/tools/visualize_lerobot_dataset.py \
-  --root /path/to/lerobot_dataset_root \
-  --episode 0 \
-  --fps 20 \
-  --image_keys image wrist_image tactile_image \
-  --value_keys actions state tactile_gripper_force \
-  --export_mp4 ./preview.mp4
-```
-
----
-
-### `lerobot_viewer_ui.py`（交互式 UI：多数据集/多 episode 浏览）
-
-精简指令（只看一个数据集）：
-
-```bash
-python scripts/tools/lerobot_viewer_ui.py --dataset /path/to/lerobot_dataset_root
-```
-
-全指令（扫描某个父目录下的多个数据集）：
-
-```bash
-python scripts/tools/lerobot_viewer_ui.py --datasets_parent /path/to/parent_dir --fps 20
-```
-
----
-
 ### `force_debug_playground.py`（力调试：回放 + 局部力曲线/保存）
 
 - **作用**：回放某条 demo，并从 `obs["policy"]["gripper_net_force"]` 提取左右指局部力 `(2,3)` 进行打印/可视化/保存。
@@ -339,13 +317,14 @@ python scripts/tools/force_debug_playground.py \
 python scripts/tools/upload_lerobot_to_hf.py --local-path /path/to/lerobot_dataset_root --repo-id your_username/your_dataset
 ```
 
-全指令（显式控制子目录与是否私有）：
+全指令（显式控制仓库类型与是否私有）：
 
 ```bash
 python scripts/tools/upload_lerobot_to_hf.py \
   --local-path /path/to/lerobot_dataset_root \
   --repo-id your_username/your_dataset \
-  --private false \
-  --include-subdirs data meta
+  --repo-type dataset \
+  --private
 ```
 
+如果要上传公开数据集，省略 `--private`。如果 Hugging Face 仓库已经存在且不希望脚本创建仓库，可加 `--no-create-repo`。

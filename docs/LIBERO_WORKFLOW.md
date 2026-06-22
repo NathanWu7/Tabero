@@ -71,17 +71,67 @@ source scripts/tools/set_replay_env.sh libero
 
 ## 3. 直接转换成 LeRobot / OpenPI 训练格式
 
-如果使用下载好的 Isaac-Libero 数据，可以直接从默认数据根目录转换：
+LeRobot/OpenPI 转换请在隔离的 `tabero_lerobot` 环境中运行，不要在 Isaac 运行环境中运行。`lerobot` 会引入一组可能和 Isaac Sim / Isaac Lab 钉死版本冲突的依赖，因此不要把它装回 Isaac 运行环境。
+
+### 3.1 配置 `tabero_lerobot` 环境
+
+如果本机还没有 `tabero_lerobot`，从仓库根目录用导出的环境文件创建：
 
 ```bash
-python benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
-  --data_root benchmarks/datasets/libero
+conda env create -f envs/environment-tabero-lerobot.yml
+conda activate tabero_lerobot
 ```
 
-最小可用输入通常包括：
+如果环境已经存在，但缺少 `lerobot` / `tyro` 等转换依赖，可以在该环境中用 freeze 文件补齐：
+
+```bash
+conda activate tabero_lerobot
+python -m pip install -r envs/requirements-tabero-lerobot.txt
+```
+
+创建或修复后，先做最小验证：
+
+```bash
+python -c "import lerobot, tyro; print('lerobot/tyro ok')"
+python -m pip check
+python benchmarks/common/convert_all_libero_to_lerobot_openpi.py --help
+```
+
+这个环境只用于 LeRobot 数据转换和相关上传/检查工具；不需要 Isaac Sim / Isaac Lab，也不用于启动仿真。
+
+### 3.2 运行转换
+
+请从 `Tabero` 仓库根目录执行：
+
+```bash
+conda activate tabero_lerobot
+python benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
+  --data_root benchmarks/datasets/libero \
+  --output_dir /tmp/tabero_lerobot_openpi
+```
+
+如果你更习惯用 `conda run`，使用：
+
+```bash
+conda run --no-capture-output -n tabero_lerobot python \
+  benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
+  --data_root benchmarks/datasets/libero \
+  --output_dir /tmp/tabero_lerobot_openpi
+```
+
+转换脚本会读取 `--data_root` 下的 `replayed_demos/` 和 `video_datasets/`。它不会直接读取 `HDF5_TRAJ_SOURCE_DIR`，`assembled_hdf5/` 主要用于 replay 输入或推理初始状态，不是直接转换 LeRobot 的输入。
+
+最小可用输入是：
 
 - `benchmarks/datasets/libero/replayed_demos`
 - `benchmarks/datasets/libero/video_datasets`
+
+如果这些目录是软链接，统计文件数量时用 `find -L`：
+
+```bash
+find -L benchmarks/datasets/libero/replayed_demos -maxdepth 1 -name '*.hdf5' | wc -l
+find -L benchmarks/datasets/libero/video_datasets -maxdepth 2 -name '*.mp4' | wc -l
+```
 
 这个转换脚本会把数据整理成：
 
@@ -91,9 +141,29 @@ python benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
 
 如果只是验证转换链路，建议先只转换少量 suite 或少量任务。
 
+常见环境错误：
+
+- `ModuleNotFoundError: No module named 'lerobot'`：命令跑在了错误环境里；切换到 `tabero_lerobot`。
+- `ModuleNotFoundError: No module named 'tyro'`：转换环境不完整；用 `python -c "import lerobot, tyro"` 验证。
+
 ## 4. 直接跑 OpenPI 推理
 
-`openpi_inference_client.py` 是本仓库的 client。真正的模型推理服务需要先在 OpenPI 仓库侧启动。
+`openpi_inference_client.py` 是本仓库的 client。真正的模型推理服务需要先在 OpenPI service 仓库侧启动。
+
+Tabero 当前对应的修改版 OpenPI service 推荐使用 [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA)。该仓库负责模型训练/推理服务侧；本仓库负责 Isaac Lab 环境和 `benchmarks/openpi/openpi_inference_client.py` 这个 Isaac 侧 client。对应权重见 [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero)。
+
+在 T2-VLA 仓库中启动 service 的模板如下：
+
+```bash
+cd /path/to/T2-VLA
+uv run python scripts/serve_policy.py \
+  --port 8000 \
+  policy:checkpoint \
+  --policy.config <config_name> \
+  --policy.dir /path/to/checkpoint
+```
+
+注意：server 侧的 `--policy.config` / checkpoint 必须和 TacManip client 的 `--control_mode` 对齐。例如 tacfield / tactile 模型通常需要 client 使用 `--control_mode tactile`；下面的 `diffik` 示例是标准 Isaac-Libero 视觉策略的 smoke test 路线。
 
 默认 server 配置是：
 
@@ -106,45 +176,93 @@ server_port = 8000
 
 ### 4.1 推荐先跑 `diffik`
 
+`diffik` 是纯视觉 / 7D 动作的 smoke test，不会向 OpenPI server 发送触觉字段。因此服务端不要使用 `pi0_lora_tacfield_tabero` 这类触觉模型，而应使用不读取 tactile 的 [`NathanWu7/pi0_lora_notac_tabero`](https://huggingface.co/NathanWu7/pi0_lora_notac_tabero)。
+
+先下载推理所需的 checkpoint 文件：
+
 ```bash
+hf download NathanWu7/pi0_lora_notac_tabero \
+  --local-dir /path/to/models/pi0_lora_notac_tabero \
+  --include 'checkpoints/pi0_lora_notac_tabero/pi0_lora_notac_tabero/49999/params/**' \
+  --include 'checkpoints/pi0_lora_notac_tabero/pi0_lora_notac_tabero/49999/assets/**' \
+  --include 'norm_stats/**'
+```
+
+在 T2-VLA 仓库中启动 no-tactile OpenPI service：
+
+```bash
+cd /path/to/T2-VLA
+
+CUDA_VISIBLE_DEVICES=0 \
+JAX_PLATFORMS=cuda \
+XLA_PYTHON_CLIENT_PREALLOCATE=false \
+uv run python scripts/serve_policy.py \
+  --port 8000 \
+  policy:checkpoint \
+  --policy.config=pi0_lora_notac_tabero \
+  --policy.dir=/path/to/models/pi0_lora_notac_tabero/checkpoints/pi0_lora_notac_tabero/pi0_lora_notac_tabero/49999
+```
+
+如果 `8000` 端口已经被其它 OpenPI service 占用，可以把 server 改到 `8001`，并在 client 命令里同步传 `--server_port 8001`。
+
+然后在 Tabero 仓库中运行 `diffik` 实验：
+
+```bash
+source scripts/tools/set_replay_env.sh inference
+
 python benchmarks/openpi/openpi_inference_client.py \
   --control_mode diffik \
   --task_suite libero_goal \
   --task_id 1 \
   --num_total_experiments 1 \
   --max_inference_steps 30 \
-  --debug_mode 0
+  --debug_mode 0 \
+  --server_host 127.0.1.1 \
+  --server_port 8000
 ```
 
 这个命令会使用：
 
 - `Isaac-Libero-Franka-IK-v0`
+- `pi0_lora_notac_tabero` 服务端模型
+- `libero_goal_task1_put_the_bowl_on_the_stove_demo.hdf5` 中的初始状态
 
-如果已经执行过：
+`debug_mode=0` 默认不落盘调试图片或动作文件，主要看终端输出。正常跑完会看到：
 
-```bash
-source scripts/tools/set_replay_env.sh inference
-```
-
-client 会自动从 `HDF5_TRAJ_SOURCE_DIR` 中找到对应任务的 HDF5，并读取其中的初始状态。
+- `Found HDF5 file: ...`
+- `[Prompt] put the bowl on the stove`
+- 单次实验结果，例如 `✓ Success` 或 `✗ Failed (max steps)`
+- 汇总结果 `Evaluation Results`，包括 `Total experiments`、`Successful experiments` 和 `Success rate`
 
 ### 4.2 可选：使用 `osc`
 
-如果 `diffik` 已经跑通，可以额外测试 OSC 控制：
+`osc` 也是纯视觉 / 7D 动作路径，和 `diffik` 使用同一个 `pi0_lora_notac_tabero` OpenPI service；不需要下载额外模型。区别在 Isaac 侧环境：`osc` 使用 `Isaac-Libero-Franka-OscPose-v0`，动作会以 7D `(x, y, z, rx, ry, rz, gripper)` 形式直接发送给 OSC 环境。
+
+如果 4.1 中的 no-tactile OpenPI service 还在运行，可以直接复用它；否则先按 4.1 的 server 命令启动 `pi0_lora_notac_tabero`。
+
+然后运行 OSC 实验：
 
 ```bash
+source scripts/tools/set_replay_env.sh inference
+
 python benchmarks/openpi/openpi_inference_client.py \
   --control_mode osc \
   --task_suite libero_goal \
   --task_id 1 \
   --num_total_experiments 1 \
   --max_inference_steps 30 \
-  --debug_mode 0
+  --debug_mode 0 \
+  --server_host 127.0.1.1 \
+  --server_port 8000
 ```
 
 这个命令会使用：
 
 - `Isaac-Libero-Franka-OscPose-v0`
+- `pi0_lora_notac_tabero` 服务端模型
+- `libero_goal_task1_put_the_bowl_on_the_stove_demo.hdf5` 中的初始状态
+
+正常跑完同样会在终端打印单次实验结果和 `Evaluation Results`。例如单次 smoke test 可能输出 `✗ Failed (max steps)`，这表示流程已跑完但该次任务未成功，不代表 client/server 链路失败。
 
 ### 4.3 推理输入字段
 
