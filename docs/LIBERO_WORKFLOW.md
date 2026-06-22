@@ -71,17 +71,67 @@ source scripts/tools/set_replay_env.sh libero
 
 ## 3. 直接转换成 LeRobot / OpenPI 训练格式
 
-如果使用下载好的 Isaac-Libero 数据，可以直接从默认数据根目录转换：
+LeRobot/OpenPI 转换请在隔离的 `tabero_lerobot` 环境中运行，不要在 Isaac 运行环境中运行。`lerobot` 会引入一组可能和 Isaac Sim / Isaac Lab 钉死版本冲突的依赖，因此不要把它装回 Isaac 运行环境。
+
+### 3.1 配置 `tabero_lerobot` 环境
+
+如果本机还没有 `tabero_lerobot`，从仓库根目录用导出的环境文件创建：
 
 ```bash
-python benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
-  --data_root benchmarks/datasets/libero
+conda env create -f envs/environment-tabero-lerobot.yml
+conda activate tabero_lerobot
 ```
 
-最小可用输入通常包括：
+如果环境已经存在，但缺少 `lerobot` / `tyro` 等转换依赖，可以在该环境中用 freeze 文件补齐：
+
+```bash
+conda activate tabero_lerobot
+python -m pip install -r envs/requirements-tabero-lerobot.txt
+```
+
+创建或修复后，先做最小验证：
+
+```bash
+python -c "import lerobot, tyro; print('lerobot/tyro ok')"
+python -m pip check
+python benchmarks/common/convert_all_libero_to_lerobot_openpi.py --help
+```
+
+这个环境只用于 LeRobot 数据转换和相关上传/检查工具；不需要 Isaac Sim / Isaac Lab，也不用于启动仿真。
+
+### 3.2 运行转换
+
+请从 `Tabero` 仓库根目录执行：
+
+```bash
+conda activate tabero_lerobot
+python benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
+  --data_root benchmarks/datasets/libero \
+  --output_dir /tmp/tabero_lerobot_openpi
+```
+
+如果你更习惯用 `conda run`，使用：
+
+```bash
+conda run --no-capture-output -n tabero_lerobot python \
+  benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
+  --data_root benchmarks/datasets/libero \
+  --output_dir /tmp/tabero_lerobot_openpi
+```
+
+转换脚本会读取 `--data_root` 下的 `replayed_demos/` 和 `video_datasets/`。它不会直接读取 `HDF5_TRAJ_SOURCE_DIR`，`assembled_hdf5/` 主要用于 replay 输入或推理初始状态，不是直接转换 LeRobot 的输入。
+
+最小可用输入是：
 
 - `benchmarks/datasets/libero/replayed_demos`
 - `benchmarks/datasets/libero/video_datasets`
+
+如果这些目录是软链接，统计文件数量时用 `find -L`：
+
+```bash
+find -L benchmarks/datasets/libero/replayed_demos -maxdepth 1 -name '*.hdf5' | wc -l
+find -L benchmarks/datasets/libero/video_datasets -maxdepth 2 -name '*.mp4' | wc -l
+```
 
 这个转换脚本会把数据整理成：
 
@@ -90,6 +140,11 @@ python benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
 - 相机图像序列
 
 如果只是验证转换链路，建议先只转换少量 suite 或少量任务。
+
+常见环境错误：
+
+- `ModuleNotFoundError: No module named 'lerobot'`：命令跑在了错误环境里；切换到 `tabero_lerobot`。
+- `ModuleNotFoundError: No module named 'tyro'`：转换环境不完整；用 `python -c "import lerobot, tyro"` 验证。
 
 ## 4. 直接跑 OpenPI 推理
 

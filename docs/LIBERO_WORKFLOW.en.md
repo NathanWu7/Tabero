@@ -71,17 +71,67 @@ If you do not want to overwrite the downloaded `replayed_demos/` and `video_data
 
 ## 3. Convert Directly to LeRobot / OpenPI Training Format
 
-If you use the downloaded Isaac-Libero data, convert directly from the default data root:
+Run the LeRobot/OpenPI conversion in the isolated `tabero_lerobot` environment, not in the Isaac runtime environment. `lerobot` pulls dependencies that can conflict with Isaac Sim / Isaac Lab pins, so do not install it back into the Isaac runtime environment.
+
+### 3.1 Configure the `tabero_lerobot` Environment
+
+If `tabero_lerobot` does not exist on the machine yet, create it from the exported environment file from the repository root:
 
 ```bash
-python benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
-  --data_root benchmarks/datasets/libero
+conda env create -f envs/environment-tabero-lerobot.yml
+conda activate tabero_lerobot
 ```
 
-The minimal usable input usually includes:
+If the environment already exists but is missing conversion dependencies such as `lerobot` or `tyro`, repair it with the frozen requirements file:
+
+```bash
+conda activate tabero_lerobot
+python -m pip install -r envs/requirements-tabero-lerobot.txt
+```
+
+After creating or repairing the environment, run the minimal checks:
+
+```bash
+python -c "import lerobot, tyro; print('lerobot/tyro ok')"
+python -m pip check
+python benchmarks/common/convert_all_libero_to_lerobot_openpi.py --help
+```
+
+This environment is only for LeRobot conversion and related upload/checking tools. It does not need Isaac Sim / Isaac Lab and should not be used to start simulation.
+
+### 3.2 Run the Conversion
+
+Run the command from the `Tabero` repository root:
+
+```bash
+conda activate tabero_lerobot
+python benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
+  --data_root benchmarks/datasets/libero \
+  --output_dir /tmp/tabero_lerobot_openpi
+```
+
+If you prefer `conda run`, use:
+
+```bash
+conda run --no-capture-output -n tabero_lerobot python \
+  benchmarks/common/convert_all_libero_to_lerobot_openpi.py \
+  --data_root benchmarks/datasets/libero \
+  --output_dir /tmp/tabero_lerobot_openpi
+```
+
+The converter reads `replayed_demos/` and `video_datasets/` under `--data_root`. It does not read `HDF5_TRAJ_SOURCE_DIR` directly, and `assembled_hdf5/` is used for replay input or inference initial states, not as the direct LeRobot conversion input.
+
+The minimal usable input is:
 
 - `benchmarks/datasets/libero/replayed_demos`
 - `benchmarks/datasets/libero/video_datasets`
+
+If those directories are symlinks, use `find -L` when checking file counts:
+
+```bash
+find -L benchmarks/datasets/libero/replayed_demos -maxdepth 1 -name '*.hdf5' | wc -l
+find -L benchmarks/datasets/libero/video_datasets -maxdepth 2 -name '*.mp4' | wc -l
+```
 
 The conversion script produces:
 
@@ -90,6 +140,11 @@ The conversion script produces:
 - Camera image sequences
 
 For a quick validation pass, convert only a small suite or a few tasks first.
+
+Common environment errors:
+
+- `ModuleNotFoundError: No module named 'lerobot'`: the command is running in the wrong environment; switch to `tabero_lerobot`.
+- `ModuleNotFoundError: No module named 'tyro'`: the conversion environment is incomplete; verify it with `python -c "import lerobot, tyro"`.
 
 ## 4. Run OpenPI Inference Directly
 
