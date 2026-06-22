@@ -148,7 +148,22 @@ Common environment errors:
 
 ## 4. Run OpenPI Inference Directly
 
-`openpi_inference_client.py` is the repository-side client. The actual model inference service must be started from the OpenPI repository.
+`openpi_inference_client.py` is the repository-side client. The actual model inference service must be started from the OpenPI service repository.
+
+For Tabero, the modified OpenPI service is maintained in [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA). That repository provides the model training/inference service side; this repository provides the Isaac Lab environments and the Isaac-side client at `benchmarks/openpi/openpi_inference_client.py`. The corresponding weights are available at [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero).
+
+Start the service from the T2-VLA repository with this template:
+
+```bash
+cd /path/to/T2-VLA
+uv run python scripts/serve_policy.py \
+  --port 8000 \
+  policy:checkpoint \
+  --policy.config <config_name> \
+  --policy.dir /path/to/checkpoint
+```
+
+Make sure the server-side `--policy.config` / checkpoint matches the TacManip client `--control_mode`. For example, tacfield / tactile models usually require the client to use `--control_mode tactile`; the `diffik` example below is the standard Isaac-Libero visual-policy smoke-test path.
 
 Default server settings are:
 
@@ -161,45 +176,93 @@ If your server uses another address, pass it explicitly in the inference command
 
 ### 4.1 Recommended First Run: `diffik`
 
+`diffik` is a visual-only / 7D-action smoke test. It does not send tactile fields to the OpenPI server, so do not use tactile checkpoints such as `pi0_lora_tacfield_tabero` for this path. Use the no-tactile checkpoint [`NathanWu7/pi0_lora_notac_tabero`](https://huggingface.co/NathanWu7/pi0_lora_notac_tabero).
+
+Download only the checkpoint files needed for serving:
+
 ```bash
+hf download NathanWu7/pi0_lora_notac_tabero \
+  --local-dir /path/to/models/pi0_lora_notac_tabero \
+  --include 'checkpoints/pi0_lora_notac_tabero/pi0_lora_notac_tabero/49999/params/**' \
+  --include 'checkpoints/pi0_lora_notac_tabero/pi0_lora_notac_tabero/49999/assets/**' \
+  --include 'norm_stats/**'
+```
+
+Start the no-tactile OpenPI service from the T2-VLA repository:
+
+```bash
+cd /path/to/T2-VLA
+
+CUDA_VISIBLE_DEVICES=0 \
+JAX_PLATFORMS=cuda \
+XLA_PYTHON_CLIENT_PREALLOCATE=false \
+uv run python scripts/serve_policy.py \
+  --port 8000 \
+  policy:checkpoint \
+  --policy.config=pi0_lora_notac_tabero \
+  --policy.dir=/path/to/models/pi0_lora_notac_tabero/checkpoints/pi0_lora_notac_tabero/pi0_lora_notac_tabero/49999
+```
+
+If port `8000` is already used by another OpenPI service, start this server on `8001` and pass `--server_port 8001` to the client command.
+
+Then run the `diffik` experiment from the Tabero repository:
+
+```bash
+source scripts/tools/set_replay_env.sh inference
+
 python benchmarks/openpi/openpi_inference_client.py \
   --control_mode diffik \
   --task_suite libero_goal \
   --task_id 1 \
   --num_total_experiments 1 \
   --max_inference_steps 30 \
-  --debug_mode 0
+  --debug_mode 0 \
+  --server_host 127.0.1.1 \
+  --server_port 8000
 ```
 
 This uses:
 
 - `Isaac-Libero-Franka-IK-v0`
+- the `pi0_lora_notac_tabero` server-side model
+- initial states from `libero_goal_task1_put_the_bowl_on_the_stove_demo.hdf5`
 
-If you already ran:
+With `debug_mode=0`, the command does not write debug images or action dumps by default; inspect stdout. A completed run prints:
 
-```bash
-source scripts/tools/set_replay_env.sh inference
-```
-
-the client will automatically find the task HDF5 in `HDF5_TRAJ_SOURCE_DIR` and read the initial state from it.
+- `Found HDF5 file: ...`
+- `[Prompt] put the bowl on the stove`
+- the per-experiment result, such as `✓ Success` or `✗ Failed (max steps)`
+- `Evaluation Results`, including `Total experiments`, `Successful experiments`, and `Success rate`
 
 ### 4.2 Optional: Use `osc`
 
-After `diffik` works, you can test OSC control with:
+`osc` is also a visual-only / 7D-action path and uses the same `pi0_lora_notac_tabero` OpenPI service as `diffik`; no extra model is needed. The Isaac-side environment is different: `osc` uses `Isaac-Libero-Franka-OscPose-v0`, and actions are sent directly to the OSC environment as 7D `(x, y, z, rx, ry, rz, gripper)` commands.
+
+If the no-tactile OpenPI service from 4.1 is still running, reuse it. Otherwise, start `pi0_lora_notac_tabero` with the server command from 4.1.
+
+Then run the OSC experiment:
 
 ```bash
+source scripts/tools/set_replay_env.sh inference
+
 python benchmarks/openpi/openpi_inference_client.py \
   --control_mode osc \
   --task_suite libero_goal \
   --task_id 1 \
   --num_total_experiments 1 \
   --max_inference_steps 30 \
-  --debug_mode 0
+  --debug_mode 0 \
+  --server_host 127.0.1.1 \
+  --server_port 8000
 ```
 
 This uses:
 
 - `Isaac-Libero-Franka-OscPose-v0`
+- the `pi0_lora_notac_tabero` server-side model
+- initial states from `libero_goal_task1_put_the_bowl_on_the_stove_demo.hdf5`
+
+A completed run prints the per-experiment result and `Evaluation Results` to stdout. For a one-run smoke test, `✗ Failed (max steps)` means the workflow completed but that particular episode did not succeed; it does not indicate a client/server connection failure.
 
 ### 4.3 Core Inputs Sent by the Client
 

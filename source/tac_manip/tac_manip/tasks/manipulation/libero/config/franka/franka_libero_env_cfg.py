@@ -17,8 +17,12 @@ from isaaclab.devices.spacemouse import Se3SpaceMouseCfg
 from isaaclab.actuators.actuator_cfg import ImplicitActuatorCfg
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg
 from isaaclab.controllers.differential_ik_cfg import DifferentialIKControllerCfg
+from isaaclab.controllers.operational_space_cfg import OperationalSpaceControllerCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
-from isaaclab.envs.mdp.actions.actions_cfg import DifferentialInverseKinematicsActionCfg
+from isaaclab.envs.mdp.actions.actions_cfg import (
+    DifferentialInverseKinematicsActionCfg,
+    OperationalSpaceControllerActionCfg,
+)
 from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
@@ -975,5 +979,4 @@ class OscPoseLiberoCameraEnvCfg(JointPositionLiberoCameraEnvCfg):
         self.teleop_devices.devices['keyboard'].rot_sensitivity = 0.5
         self.teleop_devices.devices['spacemouse'].pos_sensitivity = 1.0
         self.teleop_devices.devices['spacemouse'].rot_sensitivity = 0.5
-
 

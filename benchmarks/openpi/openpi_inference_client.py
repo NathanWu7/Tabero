@@ -241,7 +241,7 @@ class OpenpiClientArguments(ClosedLoopArguments):
     # You can override via CLI: --debug_path /abs/path/to/dir
     debug_path: str = str(project_root / "full_records")
 
-    camera_names: tuple[str] = ("agentview_cam", "eye_in_hand_cam")
+    camera_names: tuple[str, ...] = ("agentview_cam", "eye_in_hand_cam")
     tactile_sensor_names: tuple[str, str] = ("gsmini_left", "gsmini_right")
     tactile_output_type: str = "tactile_rgb"  # or "markers_rgb"
     tactile_history_len: int = 8
@@ -262,10 +262,12 @@ class OpenpiClientArguments(ClosedLoopArguments):
     #   - "binary": IK + tactile observations (GelSight), but execute 7D actions with **binary gripper**
     #
     # OpenPI server always returns a 32D action vector (padded), but:
-    #   - For "diffik"/"osc": we use the first 7D
+    #   - For "diffik": we use the first 7D
     #       (x, y, z, rx, ry, rz, gripper) - axis-angle + gripper
     #       and convert it to 8D quaternion before sending to the env:
     #       (x, y, z, qw, qx, qy, qz, gripper)
+    #   - For "osc": we use the first 7D directly:
+    #       (x, y, z, rx, ry, rz, gripper)
     #   - For "hybrid"/"tactile": we use the first 13D **directly** as the Hybrid action:
     #       (x, y, z, rx, ry, rz, gripper, fL(3), fR(3))  -- no zero padding on the client side
     control_mode: str = "diffik"
@@ -899,6 +901,17 @@ def run_closed_loop_policy(  # noqa: C901
                         hybrid_actions = action_chunk[:, :13].astype(np.float32)  # (N, 13)
                     inference_actions = torch.from_numpy(hybrid_actions).float()
                     inference_actions = inference_actions[: args.replan_steps, :]
+                elif args.control_mode == "osc":
+                    # OSC env action shape is 7D:
+                    #   Input from OpenPI: (x, y, z, rx, ry, rz, gripper)
+                    #   Output to env:     (x, y, z, rx, ry, rz, gripper)
+                    if action_chunk.shape[1] < 7:
+                        raise ValueError(
+                            f"osc control_mode expects at least 7D actions from OpenPI, "
+                            f"but got shape {action_chunk.shape}."
+                        )
+                    inference_actions = torch.from_numpy(action_chunk[:, :7].astype(np.float32)).float()
+                    inference_actions = inference_actions[: args.replan_steps, :]
                 elif args.control_mode == "binary":
                     # IK + tactile (non-hybrid) with **binary** gripper:
                     #   Input from OpenPI: (x, y, z, rx, ry, rz, gripper) - 7D axis-angle
@@ -926,12 +939,12 @@ def run_closed_loop_policy(  # noqa: C901
                     inference_actions = torch.from_numpy(eef_pose_with_gripper).float()
                     inference_actions = inference_actions[: args.replan_steps, :]
                 else:
-                    # DiffIK / OSC task-space control:
+                    # DiffIK task-space control:
                     #   Input from OpenPI: (x, y, z, rx, ry, rz, gripper) - 7D axis-angle
                     #   Output to env:     (x, y, z, qw, qx, qy, qz, gripper) - 8D quaternion
                     if action_chunk.shape[1] < 7:
                         raise ValueError(
-                            f"diffik/osc control_mode expects at least 7D actions from OpenPI, "
+                            f"diffik control_mode expects at least 7D actions from OpenPI, "
                             f"but got shape {action_chunk.shape}."
                         )
                     action_chunk_7d = action_chunk[:, :7]
