@@ -74,6 +74,20 @@ def get_task_name_and_instruction(task_suite: str, task_id: int, config_base_pat
     return f"task_{task_id}", f"Task {task_id}"
 
 
+def _should_auto_use_tabero_tasks(hdf5_folder: Optional[Path], replayed_demos_dir: str) -> bool:
+    """Infer Tabero subset mode from dataset directory names, not parent checkout names."""
+    for raw_path in (hdf5_folder, replayed_demos_dir):
+        if not raw_path:
+            continue
+        parts = [part.lower() for part in Path(raw_path).parts]
+        if "tabero_force" in parts:
+            return True
+        for idx, part in enumerate(parts[:-1]):
+            if part == "datasets" and parts[idx + 1] in {"tabero", "tabero_force"}:
+                return True
+    return False
+
+
 @dataclass
 class EvaluationConfig:
     """Configuration for running task evaluations."""
@@ -1013,10 +1027,10 @@ def main():
     subset_map = _load_tabero_task_subset(workspace_root)
     auto_tabero = False
     with suppress(Exception):
-        p = str(config.hdf5_folder) if config.hdf5_folder is not None else ""
-        env_p = os.environ.get("REPLAYED_DEMOS_DIR", "")
-        lower = (p + " " + env_p).lower()
-        auto_tabero = ("tabero_force" in lower) or ("tabero" in lower)
+        auto_tabero = _should_auto_use_tabero_tasks(
+            config.hdf5_folder,
+            os.environ.get("REPLAYED_DEMOS_DIR", ""),
+        )
 
     if config.use_tabero_tasks or auto_tabero:
         if not subset_map:

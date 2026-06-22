@@ -188,7 +188,7 @@ python benchmarks/openpi/openpi_inference_client.py \
 export HDF5_TRAJ_SOURCE_DIR=/path/to/libero/assembled_hdf5
 
 python benchmarks/openpi/openpi_inference_client.py \
-  --server_host 127.0.0.1 \
+  --server_host 127.0.1.1 \
   --server_port 8000 \
   --control_mode diffik \
   --task_suite libero_goal \
