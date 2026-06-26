@@ -26,6 +26,7 @@
 **/videos/*
 **/wandb/*
 **/.neptune/*
+evaluation_results/
 docker/artifacts/
 *.tmp
 *.hdf5

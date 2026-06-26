@@ -103,6 +103,45 @@ hf download NathanWu7/pi0_lora_tacfield_tabero \
 - **Isaac-Libero**：使用标准 LIBERO 数据和标准 Franka 环境。如果需要跑这条路线，请单独参考 [Isaac-Libero 使用手册](LIBERO_WORKFLOW.md)。
 - **Tabero**：使用力觉或触觉数据路线，包括 ContactForce、GelSight 触觉环境、13D `7dpf` 动作、Tabero 转换脚本，以及带力觉/触觉观测的 OpenPI 推理。见 [Tools 工具脚本文档](TOOLS.zh-CN.md)、[Benchmarks 与数据转换文档](BENCHMARKS.zh-CN.md) 和 [OpenPI 推理文档](OPENPI.zh-CN.md)。
 
+## 实验效果
+
+完整复现命令见 [复现文档](REPRODUCTION.zh-CN.md)。
+
+### 论文 Table 3
+
+F/G 分别表示 firm/gentle 语言提示。SR 表示成功率，AG 表示平均抓取力指标。`None` 表示不使用触觉输入，`Img` 表示触觉图像输入，`Field` 表示力场输入，`Force E` 表示通过 MLP encoder 输入力信息，`Force D` 表示通过 decoder 输入力信息，`FS` 表示启用 force-supervision loss。
+
+论文结果使用论文风格的运行设置：Isaac Lab 2.2 与 Isaac Sim 5.0，所有 `contact_gripper` 传感器绑定到 `panda_.*finger`，并设置 `squeeze_ff_k_load_z = 0.6`。
+
+| Model | F SR | G SR | F AG | G AG |
+| --- | ---: | ---: | ---: | ---: |
+| None | 0.00 | 0.00 | 0.0 | 0.0 |
+| Img | 0.37 | 0.01 | 3.0 | 1.1 |
+| Field | 0.40 | 0.01 | 2.9 | 2.0 |
+| Force E | 0.40 | 0.01 | 2.5 | 1.8 |
+| FS | 0.82 | 0.45 | 30.4 | 3.1 |
+| Force D+FS | 0.82 | 0.31 | 28.5 | 3.3 |
+| Force E+FS | 0.84 | 0.49 | 30.3 | 3.4 |
+| Img+FS | 0.87 | 0.48 | 30.6 | 3.6 |
+| Field+FS | 0.86 | 0.52 | 32.4 | 3.7 |
+
+如果要在当前代码中复现论文风格的力传感器设置，需要：
+
+- 将 [force_position_action.py](../source/tac_manip/tac_manip/tasks/manipulation/libero/mdp/force_position_action.py) 中的 `squeeze_ff_k_load_z` 改为 `0.6`。
+- 将 [franka_tactile_libero_env_cfg.py](../source/tac_manip/tac_manip/tasks/manipulation/libero/config/franka/franka_tactile_libero_env_cfg.py) 中所有 `contact_gripper.prim_path` 改为 `"{ENV_REGEX_NS}/Robot/panda_.*finger"`。
+
+### 本地 minicase 重跑结果
+
+下表记录本地 `minicase_k09` 重跑结果，使用 Isaac Lab 2.3 与 Isaac Sim 5.1。该设置下，所有 `contact_gripper` 传感器都绑定到 `gelsight_mini_case_.*`，`squeeze_ff_k_load_z = 0.9`，`squeeze_ff_contact_threshold = 1.0`。每个 firm 或 gentle 数值都在 Tabero LIBERO object 子集上汇总，共 9 个任务、450 次实验。
+
+`AG pred` 是评测汇总中的模型侧预测抓取力指标。`AG meas` 是环境侧测得的接触力指标。
+
+| Variant | Model | F SR | G SR | F AG pred | G AG pred | F AG meas | G AG meas |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| minicase_k09 | Force E+FS enc10 | 0.789 | 0.316 | 29.06 | 3.73 | 20.19 | 1.87 |
+| minicase_k09 | Img+FS | 0.860 | 0.331 | 31.91 | 3.97 | 20.57 | 2.45 |
+| minicase_k09 | Field+FS | 0.911 | 0.358 | 33.77 | 6.58 | 20.76 | 4.49 |
+
 ## 常用环境 ID
 
 - `Isaac-Libero-Franka-Replay-Camera-v0`：标准 Franka 带相机 replay。

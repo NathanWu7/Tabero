@@ -75,7 +75,7 @@ class ForcePositionActionCfg(ActionTermCfg):
     #   f_sq_target_eff = f_sq_target + squeeze_ff_k_load_z * f_sq_target
     # 等价于：f_sq_target_eff = (1 + squeeze_ff_k_load_z) * f_sq_target
     # 默认系数为 0，不改变现有行为。
-    squeeze_ff_k_load_z: float = 0.6
+    squeeze_ff_k_load_z: float = 0.9
     squeeze_ff_contact_threshold: float = 1.0  # >0 时，仅当 f_sq_meas_raw >= threshold 才启用前馈
 
     # 由 manager 使用的 ActionTerm 类型（提供一个非 MISSING 的默认值，后续在模块末尾覆盖）

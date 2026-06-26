@@ -129,7 +129,7 @@ class JointPositionContactForceLiberoCameraEnvCfg(JointPositionLiberoCameraEnvCf
 
         # add contact force sensor for gripper fingers (record current frame only)
         self.scene.contact_gripper = GripperContactSensorCfg(
-            prim_path="{ENV_REGEX_NS}/Robot/panda_.*finger",  # this prim_path must be the leaf rigid body actually in contact with the object
+            prim_path="{ENV_REGEX_NS}/Robot/gelsight_mini_case_.*",  # this prim_path must be the leaf rigid body actually in contact with the object
             update_period=0.0,
             history_length=RECORD_FORCE_HISTORY_LENGTH,
             debug_vis=False,  # if True, default is to plot contact spheres
@@ -161,7 +161,7 @@ class IKContactForceLiberoCameraEnvCfg(IKLiberoCameraEnvCfg):
 
         # add contact force sensor for gripper fingers (record current frame only)
         self.scene.contact_gripper = GripperContactSensorCfg(
-            prim_path="{ENV_REGEX_NS}/Robot/panda_.*finger",
+            prim_path="{ENV_REGEX_NS}/Robot/gelsight_mini_case_.*",
             update_period=0.0,
             history_length=RECORD_FORCE_HISTORY_LENGTH,
             debug_vis=False,
@@ -272,7 +272,7 @@ class ForcePositionLiberoCameraEnvCfg(JointPositionLiberoCameraEnvCfg):
 
         # 为 HybridForce 环境显式添加 gripper 力传感器，供 ForcePositionAction 使用
         self.scene.contact_gripper = GripperContactSensorCfg(
-            prim_path="{ENV_REGEX_NS}/Robot/panda_.*finger",  # 末端两指
+            prim_path="{ENV_REGEX_NS}/Robot/gelsight_mini_case_.*",  # 末端两指
             update_period=0.0,
             history_length=HYBRID_FORCE_HISTORY_LENGTH,
             debug_vis=False,
@@ -364,7 +364,7 @@ class JointPositionTactileLiberoCameraEnvCfg(JointPositionLiberoCameraEnvCfg):
         # FixedJoint child body contact forces to the parent articulation link (finger).
         # The finger itself has no collision, so all force on it comes from gelpad contacts.
         self.scene.contact_gripper = GripperContactSensorCfg(
-            prim_path="{ENV_REGEX_NS}/Robot/panda_.*finger",
+            prim_path="{ENV_REGEX_NS}/Robot/gelsight_mini_case_.*",
             update_period=0.0,
             history_length=RECORD_FORCE_HISTORY_LENGTH,
             debug_vis=False,
@@ -454,7 +454,7 @@ class ForcePositionTactileLiberoCameraEnvCfg(JointPositionTactileLiberoCameraEnv
         # NOTE: PhysX GPU attributes FixedJoint child body (gelpad) contact forces to the
         # parent articulation link (finger). Bind to finger to get correct force readings.
         self.scene.contact_gripper = GripperContactSensorCfg(
-            prim_path="{ENV_REGEX_NS}/Robot/panda_.*finger",
+            prim_path="{ENV_REGEX_NS}/Robot/gelsight_mini_case_.*",
             update_period=0.0,
             history_length=RECORD_FORCE_HISTORY_LENGTH,
             debug_vis=False,
@@ -535,7 +535,7 @@ class IKTactileLiberoCameraEnvCfg(IKLiberoCameraEnvCfg):
         # NOTE: PhysX GPU attributes FixedJoint child body (gelpad) contact forces to the
         # parent articulation link (finger). Bind to finger to get correct force readings.
         self.scene.contact_gripper = GripperContactSensorCfg(
-            prim_path="{ENV_REGEX_NS}/Robot/panda_.*finger",
+            prim_path="{ENV_REGEX_NS}/Robot/gelsight_mini_case_.*",
             update_period=0.0,
             history_length=RECORD_FORCE_HISTORY_LENGTH,
             debug_vis=False,
