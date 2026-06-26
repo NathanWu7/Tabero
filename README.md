@@ -131,6 +131,8 @@ To reproduce the paper-style force-sensor setting in this environment, set `sque
 
 The following local rerun uses Isaac Lab 2.3 with Isaac Sim 5.1, `gelsight_mini_case_.*` contact binding, `squeeze_ff_k_load_z = 0.9`, and `squeeze_ff_contact_threshold = 1.0`. Each firm or gentle value is aggregated over the Tabero LIBERO object subset, with 9 tasks and 450 total trials.
 
+The exported package snapshot for the local `tabero` conda environment is kept as a reference at [environment-tabero-isaaclab23-isaacsim51.yml](envs/environment-tabero-isaaclab23-isaacsim51.yml). It corresponds to the Isaac Lab 2.3 / Isaac Sim 5.1 reproduction stack and is not intended to replace the normal Isaac Lab / Isaac Sim installation steps.
+
 `AG pred` is the model-side predicted grip-force metric from the evaluation summary. `AG meas` is the measured contact-force metric reported by the environment.
 
 | Variant | Model | F SR | G SR | F AG pred | G AG pred | F AG meas | G AG meas |

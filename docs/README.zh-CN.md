@@ -134,6 +134,8 @@ F/G 分别表示 firm/gentle 语言提示。SR 表示成功率，AG 表示平均
 
 下表记录本地 `minicase_k09` 重跑结果，使用 Isaac Lab 2.3 与 Isaac Sim 5.1。该设置下，所有 `contact_gripper` 传感器都绑定到 `gelsight_mini_case_.*`，`squeeze_ff_k_load_z = 0.9`，`squeeze_ff_contact_threshold = 1.0`。每个 firm 或 gentle 数值都在 Tabero LIBERO object 子集上汇总，共 9 个任务、450 次实验。
 
+本地 `tabero` conda 环境的包快照作为参考放在 [environment-tabero-isaaclab23-isaacsim51.yml](../envs/environment-tabero-isaaclab23-isaacsim51.yml)。该文件对应 Isaac Lab 2.3 / Isaac Sim 5.1 复现环境，不用于替代正常的 Isaac Lab / Isaac Sim 安装流程。
+
 `AG pred` 是评测汇总中的模型侧预测抓取力指标。`AG meas` 是环境侧测得的接触力指标。
 
 | Variant | Model | F SR | G SR | F AG pred | G AG pred | F AG meas | G AG meas |
