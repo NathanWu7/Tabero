@@ -159,5 +159,6 @@ F/G 分别表示 firm/gentle 语言提示。SR 表示成功率，AG 表示平均
 - 标准 LIBERO 数据通常使用 7D/8D task-space 动作。
 - ContactForce 和 tactile Tabero 数据在包含力时使用 13D `7dpf` 动作。
 - OpenPI client 会向模型 server 发送 RGB 图像、腕部图像、task-space state、语言 prompt，以及可选的力觉/触觉字段。
+- Libero 光照随机化默认关闭，以保持可复现性。需要在每次环境 reset 时随机化 DomeLight 强度、颜色和 HDR 纹理时，在 replay 或 evaluation 命令中加入 `--randomize_light`。
 
 精确命令模板和常见问题请以 `docs/` 下的专题文档为准。

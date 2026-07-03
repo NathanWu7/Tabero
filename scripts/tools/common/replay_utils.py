@@ -375,10 +375,10 @@ def create_video_from_images(input_pattern: str, output_video: str, framerate: f
 
 def _base_path(task_suite: str | None, task_id: int | None, task: str | None, root_dir_prefix: str = "") -> str:
     """Compute base path for a task or suite."""
-    if task_suite is not None:
-        return f"{root_dir_prefix}{task_suite}_task{task_id}"
-    else:
-        return f"{root_dir_prefix}{task}"
+    leaf = f"{task_suite}_task{task_id}" if task_suite is not None else str(task)
+    if not root_dir_prefix:
+        return leaf
+    return os.path.join(root_dir_prefix, leaf)
 
 
 def setup_video_directories(
@@ -395,7 +395,7 @@ def setup_video_directories(
         task_suite: Task suite name.
         task_id: Task ID.
         task: Task name.
-        root_dir_prefix: Optional root prefix (e.g., "replayed_videos/").
+        root_dir_prefix: Optional output root directory (e.g., "replayed_videos").
 
     Returns:
         Video save directory path or None.

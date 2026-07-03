@@ -129,6 +129,7 @@ class EvaluationConfig:
     
     headless: bool = True
     visualize: bool = False
+    randomize_light: bool = False
     debug_mode: int = 0
     # Optional: override OpenPI client's debug output root (e.g., for debug_mode=6 captures).
     # If empty, OpenPI client uses its own default.
@@ -198,6 +199,8 @@ def build_command(config: EvaluationConfig, task_suite: str, task_id: int) -> li
         if config.prompt_adverbs:
             cmd.append("--prompt_adverbs")
             cmd.extend([str(x) for x in config.prompt_adverbs])
+        if config.randomize_light:
+            cmd.append("--randomize_light")
 
     if config.headless and not config.visualize:
         cmd.append("--headless")

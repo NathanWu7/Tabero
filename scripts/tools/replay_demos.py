@@ -92,11 +92,18 @@ parser.add_argument(
     default=False,
     help="Enable online visualization for hybrid force-position control (Hybrid env only).",
 )
+parser.add_argument(
+    "--randomize_light",
+    action="store_true",
+    default=False,
+    help="Enable Libero DomeLight intensity/color/texture randomization on every environment reset.",
+)
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
 args_cli = parser.parse_args()
+os.environ["LIBERO_RANDOMIZE_LIGHT"] = "1" if args_cli.randomize_light else "0"
 
 # Normalize: treat single task_id as scalar int to keep downstream logic unchanged.
 if isinstance(args_cli.task_id, list) and len(args_cli.task_id) == 1:

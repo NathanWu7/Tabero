@@ -224,6 +224,7 @@ class OpenpiClientArguments(ClosedLoopArguments):
     # If you want a GUI window, pass: --no-headless
     headless: bool = True
     seed: int = 11
+    randomize_light: bool = False
     # debug_mode:
     #   0: 关闭所有额外调试，仅打印基础统计信息
     #   1: 在 0 的基础上额外保存动作 (action_XXXX.npy)
@@ -298,6 +299,7 @@ class OpenpiClientArguments(ClosedLoopArguments):
 
 # Parse arguments first to get task_suite and task_id
 args = tyro.cli(OpenpiClientArguments)
+os.environ["LIBERO_RANDOMIZE_LIGHT"] = "1" if args.randomize_light else "0"
 
 
 def _choose_adverb(seed: int, key: str, adverbs: tuple[str, ...]) -> str:
