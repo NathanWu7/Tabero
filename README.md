@@ -49,7 +49,7 @@ Tabero-VTLA modulates grip force according to natural language instructions. Wat
 </td>
 <td width="50%" align="center">
   <img src="docs/assets/task1_gentle_failure.gif" width="100%" alt="Gentle Failure"/><br/>
-  <sub>🟡 <b>Failure Case</b> — Extreme low-force (10%): object slips due to insufficient grip, illustrating the gentleness-reliability trade-off</sub>
+  <sub>🟡 <b>Failure Case</b> Illustrating the gentleness-reliability trade-off</sub>
 </td>
 </tr>
 </table>
