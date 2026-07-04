@@ -1,117 +1,184 @@
-# TacManip
+<div align="center">
 
-English | [中文](docs/README.zh-CN.md)
+<img src="docs/assets/poster_preview.png" alt="Tabero Overview" width="800"/>
 
-TacManip is a manipulation data collection, replay, conversion, and inference-evaluation project built on NVIDIA **Isaac Sim + Isaac Lab**. It focuses on replaying open-source or teleoperated trajectories in Isaac, exporting consistent HDF5/video data, converting the results to LeRobot/OpenPI formats, and evaluating OpenPI policies with visual, force, and tactile observations.
+# 🤖 Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback
 
-## Documentation
+### from Vision, Touch, and Language
 
-Detailed workflows are kept under `docs/`. The root README is intentionally short and indexes the English documentation first:
+[![ICML 2026](https://img.shields.io/badge/ICML-2026-blue?style=flat-square&logo=google-scholar)](https://arxiv.org/abs/2605.27886)
+[![arXiv](https://img.shields.io/badge/arXiv-2605.27886-b31b1b?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2605.27886)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green?style=flat-square)](LICENCE)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-yellow?style=flat-square&logo=python)](https://www.python.org/)
+[![Isaac Sim](https://img.shields.io/badge/Isaac%20Sim-5.0%2B-orange?style=flat-square&logo=nvidia)](https://developer.nvidia.com/isaac-sim)
+[![Isaac Lab](https://img.shields.io/badge/Isaac%20Lab-2.2%2B-red?style=flat-square)](https://isaac-sim.github.io/IsaacLab/)
+[![Code](https://img.shields.io/badge/Code-GitHub-black?style=flat-square&logo=github)](https://github.com/NathanWu7/T2-VLA)
+[![Dataset](https://img.shields.io/badge/Dataset-Zenodo-purple?style=flat-square&logo=zenodo)](https://zenodo.org/records/19250783)
 
-- [Isaac-Libero workflow](docs/LIBERO_WORKFLOW.en.md)
-- [Tools guide](docs/TOOLS.md)
-- [Benchmarks and data conversion](docs/BENCHMARKS.md)
-- [OpenPI inference guide](docs/OPENPI.md)
+[📄 Paper](https://arxiv.org/abs/2605.27886) •
+[📦 Assets](https://zenodo.org/records/19250783) •
+[🖐️ Tactile Assets](https://huggingface.co/datasets/china-sae-robotics/Tactile_Manipulation_Dataset) •
+[🤗 Model Weights](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero)
 
-Chinese versions are linked from each English document.
+</div>
 
-## Repository Map
+---
 
-- `source/tac_manip/`: TacManip Isaac Lab extension, tasks, assets, and environment registration.
-- `scripts/tools/`: collection, replay, evaluation, visualization, and upload scripts.
-- `benchmarks/common/`: converters from Isaac-side HDF5/video outputs to LeRobot/OpenPI datasets.
-- `benchmarks/openpi/`: TacManip OpenPI inference client and debug utilities.
-- `benchmarks/datasets/`: expected local data layout for LIBERO, Tabero, Tabero-force, and converted datasets.
-- `docs/`: all user-facing documentation.
+## 📖 Abstract
 
-## Quick Setup
+Tactile sensing is essential for robots to achieve human-like gentle manipulation capabilities. However, existing Vision-Language-Action (VLA) models struggle to exploit tactile feedback for gentle manipulation due to the scarcity of aligned vision-tactile-language data and the lack of effective closed-loop force feedback mechanisms.
 
-Install the TacManip extension:
+**Tabero** addresses these challenges with:
+
+- **Tabero Benchmark** — A data-efficient pipeline that repurposes open-source robot manipulation trajectories to generate diverse vision-tactile-language tasks in a high-fidelity tactile simulator (Isaac Lab + Taxim/FOTS), paired with a multidimensional evaluation protocol.
+- **Tabero-VTLA** — A Vision-Tactile-Language-Action architecture featuring a **decoupled force-position command interface** executed by a fixed hybrid controller for real-time, force-aware manipulation.
+
+> 🔬 **Key Result:** Our model maintains high task success while **reducing average grip force by over 70%** under gentle instructions, demonstrating its ability to modulate interaction forces based on multimodal experience.
+
+---
+
+## 🎬 Demo: Force-Aware Language-Conditioned Manipulation
+
+Tabero-VTLA modulates grip force according to natural language instructions. Watch how the same task is executed differently under "gentle" vs "firm" language commands.
+
+### 🧀 Task 1: Pick up the cream cheese → Place in basket
+
+<table>
+<tr>
+<td width="50%" align="center">
+  <img src="docs/assets/task1_gentle_success.gif" width="100%" alt="Gentle Success"/><br/>
+  <sub>🟢 <b>Gentle</b> — "Gently pick up the cream cheese and place it in the basket."<br/>Significantly reduced grip force ✓</sub>
+</td>
+<td width="50%" align="center">
+  <img src="docs/assets/task1_gentle_failure.gif" width="100%" alt="Gentle Failure"/><br/>
+  <sub>🟡 <b>Failure Case</b> — Extreme low-force (10%): object slips due to insufficient grip, illustrating the gentleness-reliability trade-off</sub>
+</td>
+</tr>
+</table>
+
+### 🍮 Task 7: Pick up the chocolate pudding → Place in basket
+
+<table>
+<tr>
+<td width="50%" align="center">
+  <img src="docs/assets/task7_firm_success.gif" width="100%" alt="Firm Success"/><br/>
+  <sub>🔴 <b>Firm</b> — "Tightly pick up the chocolate pudding and place it in the basket."<br/>Standard force level applied ✓</sub>
+</td>
+<td width="50%" align="center">
+  <img src="docs/assets/task7_gentle_success.gif" width="100%" alt="Gentle Success"/><br/>
+  <sub>🟢 <b>Gentle</b> — "Softly pick up the chocolate pudding and place it in the basket."<br/>Force reduced by ~70% while maintaining stable grasping ✓</sub>
+</td>
+</tr>
+</table>
+
+---
+
+## ✨ Key Contributions
+
+<div align="center">
+
+| 🏷️ | Contribution | Description |
+|:---:|:---|:---|
+| **1** | **Tabero Benchmark** | A scalable pipeline repurposing open-source robot trajectories in a high-fidelity tactile simulator (Isaac Lab + Taxim/FOTS) to generate diverse vision-tactile-language datasets, with the **first standardized protocol for quantifying gentleness** in language-conditioned manipulation. |
+| **2** | **Tabero-VTLA** | A suite of force-aware VLA models introducing a **decoupled force-position command interface**, enabling substantially reduced contact forces while preserving high task success through closed-loop tactile feedback. |
+| **3** | **Comprehensive Evaluation** | New process-aware metrics — **Average/Maximum Grip Force**, **Average/Maximum Applied Force** — going beyond binary success rates to assess the quality of physical interaction. |
+
+</div>
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+
+- **Isaac Sim 5.0+** with **Isaac Lab 2.2+**
+- **Python 3.10+**
+- **CUDA 12.0+**
+
+### Install Tabero Extension
 
 ```bash
+# Clone the repository
+git clone https://github.com/NathanWu7/TacManip.git
+cd TacManip
+
+# Install the Isaac Lab extension
 python -m pip install -e source/tac_manip
-```
 
-Install the repository-side OpenPI inference client:
-
-```bash
+# Install the OpenPI inference client
 python -m pip install -e benchmarks/openpi/openpi-client
 ```
 
-Download the LIBERO data from [`NathanWu7/Isaaclab_Libero`](https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero). The repository expects at least `assembled_hdf5/` and `USD/`; preprocessed `replayed_demos/` and `video_datasets/` can also be used directly for training or inference.
+### Download Datasets
 
 ```bash
-hf download NathanWu7/Isaaclab_Libero \
+# LIBERO data (required for all workflows)
+huggingface-cli download NathanWu7/Isaaclab_Libero \
   --repo-type dataset \
   --local-dir /path/to/Isaaclab_Libero
+
+# Tactile calibration assets (for tactile environments)
+huggingface-cli download china-sae-robotics/Tactile_Manipulation_Dataset \
+  --repo-type dataset \
+  --local-dir /path/to/Tactile_manipulation_dataset
 ```
 
-Prepare the default LIBERO data symlinks. Keep `benchmarks/datasets/libero/config` and `benchmarks/datasets/libero/utils` from this repository; only link the downloaded data subdirectories.
+### Setup Symlinks
 
 ```bash
 LIBERO_DATA=/path/to/Isaaclab_Libero
 
 ln -sfn "$LIBERO_DATA/assembled_hdf5" benchmarks/datasets/libero/assembled_hdf5
 ln -sfn "$LIBERO_DATA/USD" benchmarks/datasets/libero/USD
-
-# Optional, useful if you use preprocessed replay/video data directly.
 ln -sfn "$LIBERO_DATA/replayed_demos" benchmarks/datasets/libero/replayed_demos
 ln -sfn "$LIBERO_DATA/video_datasets" benchmarks/datasets/libero/video_datasets
-```
 
-Verify the LIBERO links:
-
-```bash
-ls -l benchmarks/datasets/libero
-test -d benchmarks/datasets/libero/assembled_hdf5
-test -d benchmarks/datasets/libero/USD
-```
-
-Download the tactile calibration assets from [`china-sae-robotics/Tactile_Manipulation_Dataset`](https://huggingface.co/datasets/china-sae-robotics/Tactile_Manipulation_Dataset) when using tactile environments:
-
-```bash
-huggingface-cli download china-sae-robotics/Tactile_Manipulation_Dataset \
-  --repo-type dataset \
-  --local-dir /path/to/Tactile_manipulation_dataset
-```
-
-Prepare the tactile calibration asset symlink:
-
-```bash
+# Tactile calibration assets
 ln -sfn /path/to/Tactile_manipulation_dataset source/tac_manip/tac_manip/assets/data
 ```
 
-For replay recollection, use separate output directories instead of writing back to the default symlinked dataset path. See the [Isaac-Libero workflow](docs/LIBERO_WORKFLOW.en.md) and [Tools guide](docs/TOOLS.md).
+---
 
-## Model Code and Weights
+## 🚀 Quick Start
 
-The OpenPI-side model code for Tabero is maintained in [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA). This repository provides the model-serving/training side; TacManip provides the Isaac Lab environments, data conversion tools, and inference client.
-
-The corresponding model weights are available at [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero):
+### Evaluation with Pre-trained Models
 
 ```bash
-hf download NathanWu7/pi0_lora_tacfield_tabero \
+# Download model weights
+huggingface-cli download NathanWu7/pi0_lora_tacfield_tabero \
   --local-dir /path/to/pi0_lora_tacfield_tabero
+
+# Start the model server (from the T2-VLA repository)
+# Then run evaluation:
+python benchmarks/openpi/openpi_inference_client.py
+
+# or batch evaluation:
+python scripts/tools/run_task_evaluations.py
 ```
 
-During closed-loop evaluation, start the model service from the model-code repository, then run TacManip's `benchmarks/openpi/openpi_inference_client.py` or `scripts/tools/run_task_evaluations.py` as the Isaac-side client.
+### Training
 
-## Main Workflows
+Model training code is maintained in the companion repository **[NathanWu7/T2-VLA](https://github.com/NathanWu7/T2-VLA)**. This repository provides the Isaac Lab environments, data conversion tools, and inference client.
 
-You can choose either the **Isaac-Libero** path or the **Tabero** path:
+---
 
-- **Isaac-Libero**: use standard LIBERO data and standard Franka environments. If you need this path, follow the dedicated [Isaac-Libero workflow](docs/LIBERO_WORKFLOW.en.md).
-- **Tabero**: use the force or tactile data path, including ContactForce and GelSight-based environments, 13D `7dpf` actions, Tabero conversion scripts, and OpenPI inference with force/tactile observations. See [Tools guide](docs/TOOLS.md), [Benchmarks and data conversion](docs/BENCHMARKS.md), and [OpenPI inference guide](docs/OPENPI.md).
+## 📊 Experiment Results
 
-## Experiment Results
+### ⚙️ Reproduction Notes
 
-For full reproduction commands, see the [reproduction guide](docs/REPRODUCTION.md).
+> **Paper results (Table 3)** were obtained with **Isaac Lab 2.2 + Isaac Sim 5.0**, with the contact force sensor bound to the **gelpad** (the sensor contact surface).
 
-### Paper Table 3
+> In **Isaac Lab 2.3 + Isaac Sim 5.1**, binding the force sensor to the gelpad fails due to an **unknown bug**. A viable workaround is to bind the sensor to the **minicase** (the sensor housing) instead — this introduces some performance degradation but produces functional results (see the Minicase Rerun table below).
 
-F/G refer to firm/gentle language prompts. SR is success rate, and AG is the average grip-force metric. `None` means no tactile input, `Img` means tactile image input, `Field` means force-field input, `Force E` means force input through an MLP encoder, `Force D` means force input through a decoder, and `FS` means force-supervision loss is enabled.
+> ⚠️ **If you encounter or solve this force sensor binding issue, please help by opening a GitHub Issue — contributions are greatly appreciated!**
 
-The paper numbers use the paper-style runtime setting: Isaac Lab 2.2 with Isaac Sim 5.0, all `contact_gripper` sensors bound to `panda_.*finger`, and `squeeze_ff_k_load_z = 0.6`.
+---
+
+<details open>
+<summary><b>Paper Table 3 — Main Results (Isaac Lab 2.2 + Isaac Sim 5.0, gelpad binding)</b></summary>
+<br/>
+
+*F/G = Firm/Gentle prompts. SR = Success Rate. AG = Average Grip-force. See the paper for full details.*
 
 | Model | F SR | G SR | F AG | G AG |
 | --- | ---: | ---: | ---: | ---: |
@@ -123,39 +190,111 @@ The paper numbers use the paper-style runtime setting: Isaac Lab 2.2 with Isaac 
 | Force D+FS | 0.82 | 0.31 | 28.5 | 3.3 |
 | Force E+FS | 0.84 | 0.49 | 30.3 | 3.4 |
 | Img+FS | 0.87 | 0.48 | 30.6 | 3.6 |
-| Field+FS | 0.86 | 0.52 | 32.4 | 3.7 |
+| **Field+FS** | **0.86** | **0.52** | **32.4** | **3.7** |
 
-To reproduce the paper-style force-sensor setting in this environment, set `squeeze_ff_k_load_z = 0.6` in [force_position_action.py](source/tac_manip/tac_manip/tasks/manipulation/libero/mdp/force_position_action.py), and set every `contact_gripper.prim_path` in [franka_tactile_libero_env_cfg.py](source/tac_manip/tac_manip/tasks/manipulation/libero/config/franka/franka_tactile_libero_env_cfg.py) to `"{ENV_REGEX_NS}/Robot/panda_.*finger"`.
+</details>
 
-### Local Minicase Rerun
+<details>
+<summary><b>Local Minicase Rerun (Isaac Lab 2.3 + Isaac Sim 5.1, minicase binding workaround)</b></summary>
+<br/>
 
-The following local rerun uses Isaac Lab 2.3 with Isaac Sim 5.1, `gelsight_mini_case_.*` contact binding, `squeeze_ff_k_load_z = 0.9`, and `squeeze_ff_contact_threshold = 1.0`. Each firm or gentle value is aggregated over the Tabero LIBERO object subset, with 9 tasks and 450 total trials.
-
-The exported package snapshot for the local `tabero` conda environment is kept as a reference at [environment-tabero-isaaclab23-isaacsim51.yml](envs/environment-tabero-isaaclab23-isaacsim51.yml). It corresponds to the Isaac Lab 2.3 / Isaac Sim 5.1 reproduction stack and is not intended to replace the normal Isaac Lab / Isaac Sim installation steps.
-
-`AG pred` is the model-side predicted grip-force metric from the evaluation summary. `AG meas` is the measured contact-force metric reported by the environment.
+*9 tasks, 450 total trials. `minicase` refers to the sensor housing. `AG pred` = model-predicted, `AG meas` = contact-force measured.*
 
 | Variant | Model | F SR | G SR | F AG pred | G AG pred | F AG meas | G AG meas |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | minicase_k09 | Force E+FS enc10 | 0.789 | 0.316 | 29.06 | 3.73 | 20.19 | 1.87 |
 | minicase_k09 | Img+FS | 0.860 | 0.331 | 31.91 | 3.97 | 20.57 | 2.45 |
-| minicase_k09 | Field+FS | 0.911 | 0.358 | 33.77 | 6.58 | 20.76 | 4.49 |
+| minicase_k09 | **Field+FS** | **0.911** | **0.358** | **33.77** | **6.58** | **20.76** | **4.49** |
 
-## Common Environment IDs
+</details>
 
-- `Isaac-Libero-Franka-Replay-Camera-v0`: standard Franka replay with cameras.
-- `Isaac-Libero-Franka-IK-v0`: standard task-space DiffIK environment.
-- `Isaac-Libero-Franka-OscPose-v0`: OSC pose-control environment.
-- `Isaac-Libero-Franka-Replay-Camera-ContactForce-v0`: replay with contact-force observations.
-- `Isaac-Libero-Franka-Hybrid-ContactForce-v0`: hybrid force-position control with contact force.
-- `Isaac-Libero-Franka-Replay-Camera-Tactile-v0`: replay with GelSight tactile sensors.
-- `Isaac-Libero-Franka-Hybrid-Tactile-v0`: hybrid tactile environment.
+---
 
-## Data and Model Notes
+## 📂 Repository Map
 
-- Standard LIBERO data usually uses 7D/8D task-space actions.
-- ContactForce and tactile Tabero data use 13D `7dpf` actions when force is included.
-- The OpenPI client sends RGB images, wrist images, task-space state, language prompt, and optional force/tactile fields to the model server.
-- Libero light randomization is off by default for reproducibility. Add `--randomize_light` to replay or evaluation commands to randomize DomeLight intensity, color, and HDR texture on each environment reset.
+| Directory | Description |
+|:---|:---|
+| `source/tac_manip/` | Tabero Isaac Lab extension — tasks, assets, environment registration |
+| `scripts/tools/` | Collection, replay, evaluation, visualization, and upload scripts |
+| `benchmarks/common/` | Converters from Isaac-side HDF5/video to LeRobot/OpenPI datasets |
+| `benchmarks/openpi/` | Tabero OpenPI inference client and debug utilities |
+| `benchmarks/datasets/` | Expected local data layout for LIBERO, Tabero, and converted datasets |
+| `docs/` | All user-facing documentation |
+| `envs/` | Reference conda environment snapshots |
+| `docker/` | Docker build files |
+| `tests/` | Unit tests |
 
-For exact command templates and troubleshooting, use the dedicated documentation under `docs/`.
+---
+
+## 🎮 Environment IDs
+
+| Environment ID | Description |
+|:---|:---|
+| `Isaac-Libero-Franka-Replay-Camera-v0` | Standard Franka replay with cameras |
+| `Isaac-Libero-Franka-IK-v0` | Standard task-space DiffIK environment |
+| `Isaac-Libero-Franka-OscPose-v0` | OSC pose-control environment |
+| `Isaac-Libero-Franka-Replay-Camera-ContactForce-v0` | Replay with contact-force observations |
+| `Isaac-Libero-Franka-Hybrid-ContactForce-v0` | Hybrid force-position control with contact force |
+| `Isaac-Libero-Franka-Replay-Camera-Tactile-v0` | Replay with GelSight tactile sensors |
+| `Isaac-Libero-Franka-Hybrid-Tactile-v0` | Hybrid tactile environment |
+
+---
+
+## 📚 Documentation
+
+Detailed workflow documentation is organized under [`docs/`](docs/):
+
+| Document | Language |
+|:---|:---|
+| [Isaac-Libero Workflow](docs/LIBERO_WORKFLOW.en.md) | English |
+| [Tools Guide](docs/TOOLS.md) | English |
+| [Benchmarks & Data Conversion](docs/BENCHMARKS.md) | English / [中文](docs/BENCHMARKS.zh-CN.md) |
+| [OpenPI Inference Guide](docs/OPENPI.md) | English / [中文](docs/OPENPI.zh-CN.md) |
+| [Reproduction Guide](docs/REPRODUCTION.md) | English / [中文](docs/REPRODUCTION.zh-CN.md) |
+
+---
+
+## 🔗 Related Repositories
+
+| Repository | Description |
+|:---|:---|
+| [NathanWu7/T2-VLA](https://github.com/NathanWu7/T2-VLA) | Tabero VTLA model training and serving code |
+| [NathanWu7/pi0_lora_tacfield_tabero](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero) | Pre-trained LoRA model weights |
+| [NathanWu7/Isaaclab_Libero](https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero) | LIBERO benchmark data for Isaac Lab |
+| [china-sae-robotics/Tactile_Manipulation_Dataset](https://huggingface.co/datasets/china-sae-robotics/Tactile_Manipulation_Dataset) | Tactile calibration dataset |
+
+---
+
+## 📝 Citation
+
+If you find Tabero useful in your research, please cite:
+
+```bibtex
+@misc{wu2026taberolearninggentlemanipulation,
+      title={Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback from Vision, Touch, and Language}, 
+      author={Qiwei Wu and Rui Zhang and Xin Xiang and Tao Li and Weihua Zhang and Junjie Lai and Renjing Xu},
+      year={2026},
+      eprint={2605.27886},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2605.27886}, 
+}
+```
+
+<div align="center">
+  <sub>If you use the tactile simulation pipeline, please also cite Taxim and FOTS_Tactile.</sub>
+</div>
+
+---
+
+## 📄 License
+
+This project is released under the [Apache License 2.0](LICENCE).
+
+---
+
+<div align="center">
+  <sub>🤖 Built with <a href="https://developer.nvidia.com/isaac-sim">Isaac Sim</a> · <a href="https://isaac-sim.github.io/IsaacLab/">Isaac Lab</a> · <a href="https://github.com/NathanWu7/T2-VLA">T2-VLA</a></sub>
+  <br/>
+  <sub>English | <a href="docs/README.zh-CN.md">中文</a></sub>
+</div>
