@@ -2,9 +2,7 @@
 
 <img src="docs/assets/poster_preview.png" alt="Tabero Overview" width="800"/>
 
-# 🤖 Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback
-
-### from Vision, Touch, and Language
+# 🤖 Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback from Vision, Touch, and Language
 
 [![ICML 2026](https://img.shields.io/badge/ICML-2026-blue?style=flat-square&logo=google-scholar)](https://arxiv.org/abs/2605.27886)
 [![arXiv](https://img.shields.io/badge/arXiv-2605.27886-b31b1b?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2605.27886)
