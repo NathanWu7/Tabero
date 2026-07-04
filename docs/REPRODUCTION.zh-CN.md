@@ -7,7 +7,7 @@
 - `Field+FS`
 
 OpenPI 侧模型服务请从修改版
-[`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA) 仓库启动。Isaac 侧评测 client 从当前 Tabero 仓库运行。
+[`NathanWu7/Tabero-VTLA`](https://github.com/NathanWu7/Tabero-VTLA) 仓库启动。Isaac 侧评测 client 从当前 Tabero 仓库运行。
 
 ## 表 3 结果
 
@@ -45,7 +45,7 @@ F/G 分别表示 firm/gentle 语言提示。SR 表示成功率，AG 表示论文
 
 ```bash
 TABERO_ROOT=/path/to/Tabero
-T2_VLA_ROOT=/path/to/T2-VLA
+Tabero_VTLA_ROOT=/path/to/Tabero-VTLA
 MODEL_ROOT=/path/to/models
 ```
 
@@ -62,7 +62,7 @@ OpenPI service 和 Tabero client 必须使用一致的 host 和 port。下面命
 server_host = 127.0.1.1
 ```
 
-每个模型都先从 `T2_VLA_ROOT` 启动 server，等待日志出现 `server listening on 0.0.0.0:<PORT>`，再从 `TABERO_ROOT` 运行 firm 和 gentle 评测命令。
+每个模型都先从 `Tabero_VTLA_ROOT` 启动 server，等待日志出现 `server listening on 0.0.0.0:<PORT>`，再从 `TABERO_ROOT` 运行 firm 和 gentle 评测命令。
 
 评测命令使用 Tabero task 子集和下载好的 LIBERO 初始状态：
 
@@ -80,7 +80,7 @@ server_host = 127.0.1.1
 | 项目 | 值 |
 | --- | --- |
 | HF 仓库 | [`NathanWu7/pi0_lora_tacforce_tabero_enc_10`](https://huggingface.co/NathanWu7/pi0_lora_tacforce_tabero_enc_10) |
-| T2-VLA config | `pi0_lora_tacforce_tabero_enc` |
+| Tabero-VTLA config | `pi0_lora_tacforce_tabero_enc` |
 | Checkpoint step | `49999` |
 | Checkpoint dir | `$MODEL_ROOT/pi0_lora_tacforce_tabero_enc_10/checkpoints/pi0_lora_tacforce_tabero_enc/pi0_lora_tacforce_tabero_enc_10/49999` |
 
@@ -94,7 +94,7 @@ hf download NathanWu7/pi0_lora_tacforce_tabero_enc_10 \
   --include 'norm_stats/**'
 ```
 
-该 T2-VLA config 期望 checkpoint step 下存在 `assets/NathanWu7/tabero`。如果下载后的 checkpoint 里没有该 assets 目录，将下载到的 norm stats 链接到 checkpoint assets 目录：
+该 Tabero-VTLA config 期望 checkpoint step 下存在 `assets/NathanWu7/tabero`。如果下载后的 checkpoint 里没有该 assets 目录，将下载到的 norm stats 链接到 checkpoint assets 目录：
 
 ```bash
 CHECKPOINT_DIR="$MODEL_ROOT/pi0_lora_tacforce_tabero_enc_10/checkpoints/pi0_lora_tacforce_tabero_enc/pi0_lora_tacforce_tabero_enc_10/49999"
@@ -106,7 +106,7 @@ ln -sfn "$MODEL_ROOT/pi0_lora_tacforce_tabero_enc_10/norm_stats/pi0_lora_tacforc
 启动 OpenPI service：
 
 ```bash
-cd "$T2_VLA_ROOT"
+cd "$Tabero_VTLA_ROOT"
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \
@@ -169,7 +169,7 @@ conda run --no-capture-output -n tabero python -u scripts/tools/run_task_evaluat
 | 项目 | 值 |
 | --- | --- |
 | HF 仓库 | [`NathanWu7/pi0_lora_tacimg_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacimg_tabero) |
-| T2-VLA config | `pi0_lora_tacimg_tabero` |
+| Tabero-VTLA config | `pi0_lora_tacimg_tabero` |
 | Checkpoint step | `49999` |
 | Checkpoint dir | `$MODEL_ROOT/pi0_lora_tacimg_tabero/checkpoints/pi0_lora_tacimg_tabero/pi0_lora_tacimg_tabero/49999` |
 
@@ -186,7 +186,7 @@ hf download NathanWu7/pi0_lora_tacimg_tabero \
 启动 OpenPI service：
 
 ```bash
-cd "$T2_VLA_ROOT"
+cd "$Tabero_VTLA_ROOT"
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \
@@ -249,7 +249,7 @@ conda run --no-capture-output -n tabero python -u scripts/tools/run_task_evaluat
 | 项目 | 值 |
 | --- | --- |
 | HF 仓库 | [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero) |
-| T2-VLA config | `pi0_lora_tacfield_tabero` |
+| Tabero-VTLA config | `pi0_lora_tacfield_tabero` |
 | Checkpoint step | `49999` |
 | Checkpoint dir | `$MODEL_ROOT/pi0_lora_tacfield_tabero/checkpoints/pi0_lora_tacfield_tabero/pi0_lora_tacfield_tabero/49999` |
 
@@ -263,7 +263,7 @@ hf download NathanWu7/pi0_lora_tacfield_tabero \
   --include 'norm_stats/**'
 ```
 
-该 T2-VLA config 期望存在 `assets/NathanWu7/tabero_object_25`。如果 checkpoint 里只有 `assets/NathanWu7/tabero`，在 checkpoint 的 assets 目录下创建本地软链接：
+该 Tabero-VTLA config 期望存在 `assets/NathanWu7/tabero_object_25`。如果 checkpoint 里只有 `assets/NathanWu7/tabero`，在 checkpoint 的 assets 目录下创建本地软链接：
 
 ```bash
 cd "$MODEL_ROOT/pi0_lora_tacfield_tabero/checkpoints/pi0_lora_tacfield_tabero/pi0_lora_tacfield_tabero/49999/assets/NathanWu7"
@@ -273,7 +273,7 @@ ln -sfn tabero tabero_object_25
 启动 OpenPI service：
 
 ```bash
-cd "$T2_VLA_ROOT"
+cd "$Tabero_VTLA_ROOT"
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \

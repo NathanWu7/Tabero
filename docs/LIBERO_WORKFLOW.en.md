@@ -167,12 +167,12 @@ Common environment errors:
 
 `openpi_inference_client.py` is the repository-side client. The actual model inference service must be started from the OpenPI service repository.
 
-For Tabero, the modified OpenPI service is maintained in [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA). That repository provides the model training/inference service side; this repository provides the Isaac Lab environments and the Isaac-side client at `benchmarks/openpi/openpi_inference_client.py`. The corresponding weights are available at [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero).
+For Tabero, the modified OpenPI service is maintained in [`NathanWu7/Tabero-VTLA`](https://github.com/NathanWu7/Tabero-VTLA). That repository provides the model training/inference service side; this repository provides the Isaac Lab environments and the Isaac-side client at `benchmarks/openpi/openpi_inference_client.py`. The corresponding weights are available at [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero).
 
-Start the service from the T2-VLA repository with this template:
+Start the service from the Tabero-VTLA repository with this template:
 
 ```bash
-cd /path/to/T2-VLA
+cd /path/to/Tabero-VTLA
 uv run python scripts/serve_policy.py \
   --port 8000 \
   policy:checkpoint \
@@ -205,10 +205,10 @@ hf download NathanWu7/pi0_lora_notac_tabero \
   --include 'norm_stats/**'
 ```
 
-Start the no-tactile OpenPI service from the T2-VLA repository:
+Start the no-tactile OpenPI service from the Tabero-VTLA repository:
 
 ```bash
-cd /path/to/T2-VLA
+cd /path/to/Tabero-VTLA
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \

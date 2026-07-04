@@ -8,7 +8,7 @@ reproduction commands for the last three rows:
 - `Field+FS`
 
 The OpenPI-side model service should be started from the modified
-[`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA) repository. The
+[`NathanWu7/Tabero-VTLA`](https://github.com/NathanWu7/Tabero-VTLA) repository. The
 Isaac-side evaluation client runs from this Tabero repository.
 
 ## Table 3 Results
@@ -59,7 +59,7 @@ Use three local roots:
 
 ```bash
 TABERO_ROOT=/path/to/Tabero
-T2_VLA_ROOT=/path/to/T2-VLA
+Tabero_VTLA_ROOT=/path/to/Tabero-VTLA
 MODEL_ROOT=/path/to/models
 ```
 
@@ -78,7 +78,7 @@ commands below use:
 server_host = 127.0.1.1
 ```
 
-For each model, run the server command from `T2_VLA_ROOT`, wait until the server
+For each model, run the server command from `Tabero_VTLA_ROOT`, wait until the server
 prints `server listening on 0.0.0.0:<PORT>`, then run the firm and gentle
 evaluation commands from `TABERO_ROOT`.
 
@@ -99,7 +99,7 @@ initial states:
 | Item | Value |
 | --- | --- |
 | HF repo | [`NathanWu7/pi0_lora_tacforce_tabero_enc_10`](https://huggingface.co/NathanWu7/pi0_lora_tacforce_tabero_enc_10) |
-| T2-VLA config | `pi0_lora_tacforce_tabero_enc` |
+| Tabero-VTLA config | `pi0_lora_tacforce_tabero_enc` |
 | Checkpoint step | `49999` |
 | Checkpoint dir | `$MODEL_ROOT/pi0_lora_tacforce_tabero_enc_10/checkpoints/pi0_lora_tacforce_tabero_enc/pi0_lora_tacforce_tabero_enc_10/49999` |
 
@@ -113,7 +113,7 @@ hf download NathanWu7/pi0_lora_tacforce_tabero_enc_10 \
   --include 'norm_stats/**'
 ```
 
-This T2-VLA config expects `assets/NathanWu7/tabero` under the checkpoint step.
+This Tabero-VTLA config expects `assets/NathanWu7/tabero` under the checkpoint step.
 If the downloaded checkpoint does not contain that assets directory, link the
 downloaded norm stats into the checkpoint assets directory:
 
@@ -127,7 +127,7 @@ ln -sfn "$MODEL_ROOT/pi0_lora_tacforce_tabero_enc_10/norm_stats/pi0_lora_tacforc
 Start the OpenPI service:
 
 ```bash
-cd "$T2_VLA_ROOT"
+cd "$Tabero_VTLA_ROOT"
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \
@@ -190,7 +190,7 @@ conda run --no-capture-output -n tabero python -u scripts/tools/run_task_evaluat
 | Item | Value |
 | --- | --- |
 | HF repo | [`NathanWu7/pi0_lora_tacimg_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacimg_tabero) |
-| T2-VLA config | `pi0_lora_tacimg_tabero` |
+| Tabero-VTLA config | `pi0_lora_tacimg_tabero` |
 | Checkpoint step | `49999` |
 | Checkpoint dir | `$MODEL_ROOT/pi0_lora_tacimg_tabero/checkpoints/pi0_lora_tacimg_tabero/pi0_lora_tacimg_tabero/49999` |
 
@@ -207,7 +207,7 @@ hf download NathanWu7/pi0_lora_tacimg_tabero \
 Start the OpenPI service:
 
 ```bash
-cd "$T2_VLA_ROOT"
+cd "$Tabero_VTLA_ROOT"
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \
@@ -270,7 +270,7 @@ conda run --no-capture-output -n tabero python -u scripts/tools/run_task_evaluat
 | Item | Value |
 | --- | --- |
 | HF repo | [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero) |
-| T2-VLA config | `pi0_lora_tacfield_tabero` |
+| Tabero-VTLA config | `pi0_lora_tacfield_tabero` |
 | Checkpoint step | `49999` |
 | Checkpoint dir | `$MODEL_ROOT/pi0_lora_tacfield_tabero/checkpoints/pi0_lora_tacfield_tabero/pi0_lora_tacfield_tabero/49999` |
 
@@ -284,7 +284,7 @@ hf download NathanWu7/pi0_lora_tacfield_tabero \
   --include 'norm_stats/**'
 ```
 
-This T2-VLA config expects `assets/NathanWu7/tabero_object_25`. If the checkpoint
+This Tabero-VTLA config expects `assets/NathanWu7/tabero_object_25`. If the checkpoint
 only contains `assets/NathanWu7/tabero`, create a local symlink inside the
 checkpoint assets directory:
 
@@ -296,7 +296,7 @@ ln -sfn tabero tabero_object_25
 Start the OpenPI service:
 
 ```bash
-cd "$T2_VLA_ROOT"
+cd "$Tabero_VTLA_ROOT"
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \

@@ -85,7 +85,7 @@ ln -sfn /path/to/Tactile_manipulation_dataset source/tac_manip/tac_manip/assets/
 
 ## 模型代码与权重
 
-Tabero 对应的 OpenPI 侧模型代码维护在 [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA)。该仓库负责模型训练/推理服务侧；TacManip 负责 Isaac Lab 环境、数据转换工具和推理 client。
+Tabero 对应的 OpenPI 侧模型代码维护在 [`NathanWu7/Tabero-VTLA`](https://github.com/NathanWu7/Tabero-VTLA)。该仓库负责模型训练/推理服务侧；TacManip 负责 Isaac Lab 环境、数据转换工具和推理 client。
 
 对应模型权重位于 [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero)：
 

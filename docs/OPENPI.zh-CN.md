@@ -9,7 +9,7 @@
 - **OpenPI Server**：模型推理服务，在 TacManip 外部运行，提供 `host:port`。
 - **TacManip Client**：本仓库的 `benchmarks/openpi/openpi_inference_client.py`，负责启动 Isaac Sim / Isaac Lab 环境、采集观测、调用 server 推理，并把动作执行到环境里。
 
-Tabero 当前推荐的 OpenPI-side service 是修改版仓库 [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA)。[`Physical-Intelligence/openpi`](https://github.com/Physical-Intelligence/openpi) 是上游参考，不是本文推荐直接用于 Tabero 的服务端。
+Tabero 当前推荐的 OpenPI-side service 是修改版仓库 [`NathanWu7/Tabero-VTLA`](https://github.com/NathanWu7/Tabero-VTLA)。[`Physical-Intelligence/openpi`](https://github.com/Physical-Intelligence/openpi) 是上游参考，不是本文推荐直接用于 Tabero 的服务端。
 
 ---
 
@@ -40,7 +40,7 @@ source scripts/tools/set_replay_env.sh inference
 - client 会从这个目录里自动找对应 task 的 HDF5，并读取 episode 的 `initial_state`
 - 也可用 CLI：`--hdf5-folder /path/to/...`，它会写回 `HDF5_TRAJ_SOURCE_DIR`
 
-### 3）启动 T2-VLA OpenPI service（必须）
+### 3）启动 Tabero-VTLA OpenPI service（必须）
 
 先下载 `diffik` / `osc` smoke test 使用的 no-tactile 模型：
 
@@ -52,10 +52,10 @@ hf download NathanWu7/pi0_lora_notac_tabero \
   --include 'norm_stats/**'
 ```
 
-然后在 T2-VLA 仓库中启动服务：
+然后在 Tabero-VTLA 仓库中启动服务：
 
 ```bash
-cd /path/to/T2-VLA
+cd /path/to/Tabero-VTLA
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \
@@ -67,7 +67,7 @@ uv run python scripts/serve_policy.py \
   --policy.dir=/path/to/models/pi0_lora_notac_tabero/checkpoints/pi0_lora_notac_tabero/pi0_lora_notac_tabero/49999
 ```
 
-T2-VLA 的 `serve_policy.py` 会监听 `0.0.0.0`。TacManip client 默认连接：
+Tabero-VTLA 的 `serve_policy.py` 会监听 `0.0.0.0`。TacManip client 默认连接：
 
 ```text
 server_host = 127.0.1.1
@@ -98,10 +98,10 @@ python benchmarks/openpi/openpi_inference_client.py \
 
 ### 1）通用启动模板
 
-在 T2-VLA 仓库中，任意 checkpoint 都可以按下面模板启动：
+在 Tabero-VTLA 仓库中，任意 checkpoint 都可以按下面模板启动：
 
 ```bash
-cd /path/to/T2-VLA
+cd /path/to/Tabero-VTLA
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \
@@ -141,7 +141,7 @@ hf download NathanWu7/pi0_lora_tacfield_tabero \
 启动 tacfield service：
 
 ```bash
-cd /path/to/T2-VLA
+cd /path/to/Tabero-VTLA
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \
@@ -170,7 +170,7 @@ uv run python scripts/serve_policy.py \
 
 ### 2）client 输入给 OpenPI 的字段
 
-TacManip client 会同时发送顶层 key 和 `observation/...` 兼容 key。T2-VLA 当前读取顶层 key。
+TacManip client 会同时发送顶层 key 和 `observation/...` 兼容 key。Tabero-VTLA 当前读取顶层 key。
 
 所有模式都会发送：
 
@@ -303,7 +303,7 @@ python benchmarks/openpi/openpi_inference_client.py \
   - 该目录下应有 `params/` 和 `assets/`
 
 - **OpenPI server 连不上**
-  - 检查 T2-VLA service 是否还在运行
+  - 检查 Tabero-VTLA service 是否还在运行
   - 检查服务端 `--port` 和 client `--server_port` 是否一致
   - 跨机器运行时，把 `--server_host` 改成 server 实际 IP（不要只用 `127.0.1.1`）
 
@@ -313,5 +313,5 @@ python benchmarks/openpi/openpi_inference_client.py \
 
 Tabero 模型训练、微调和 OpenPI service 侧代码请参考：
 
-- [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA)
+- [`NathanWu7/Tabero-VTLA`](https://github.com/NathanWu7/Tabero-VTLA)
 - 上游参考：[`Physical-Intelligence/openpi`](https://github.com/Physical-Intelligence/openpi)

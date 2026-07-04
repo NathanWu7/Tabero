@@ -9,7 +9,7 @@ OpenPI inference has two parts:
 - **OpenPI server**: the model inference service, started outside this repository and exposed as `host:port`.
 - **TacManip client**: `benchmarks/openpi/openpi_inference_client.py`, which starts Isaac Sim / Isaac Lab, collects observations, calls the server, and executes returned actions.
 
-For Tabero, the recommended OpenPI-side service is the modified repository [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA). [`Physical-Intelligence/openpi`](https://github.com/Physical-Intelligence/openpi) is the upstream reference, not the recommended service to run directly for Tabero.
+For Tabero, the recommended OpenPI-side service is the modified repository [`NathanWu7/Tabero-VTLA`](https://github.com/NathanWu7/Tabero-VTLA). [`Physical-Intelligence/openpi`](https://github.com/Physical-Intelligence/openpi) is the upstream reference, not the recommended service to run directly for Tabero.
 
 ## Quickstart
 
@@ -34,7 +34,7 @@ source scripts/tools/set_replay_env.sh inference
 
 The directory should contain task HDF5 files named like `{task_suite}_task{task_id}_*_demo.hdf5`. You can also pass `--hdf5-folder /path/to/...`, which updates `HDF5_TRAJ_SOURCE_DIR` for the client run.
 
-### 3. Start the T2-VLA OpenPI service
+### 3. Start the Tabero-VTLA OpenPI service
 
 Download the no-tactile model used by the `diffik` / `osc` smoke tests:
 
@@ -46,10 +46,10 @@ hf download NathanWu7/pi0_lora_notac_tabero \
   --include 'norm_stats/**'
 ```
 
-Start the service from the T2-VLA repository:
+Start the service from the Tabero-VTLA repository:
 
 ```bash
-cd /path/to/T2-VLA
+cd /path/to/Tabero-VTLA
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \
@@ -61,7 +61,7 @@ uv run python scripts/serve_policy.py \
   --policy.dir=/path/to/models/pi0_lora_notac_tabero/checkpoints/pi0_lora_notac_tabero/pi0_lora_notac_tabero/49999
 ```
 
-T2-VLA's `serve_policy.py` listens on `0.0.0.0`. The TacManip client defaults to:
+Tabero-VTLA's `serve_policy.py` listens on `0.0.0.0`. The TacManip client defaults to:
 
 ```text
 server_host = 127.0.1.1
@@ -90,10 +90,10 @@ Expected terminal output includes the prompt, one experiment result, and a summa
 
 ### Generic service command
 
-From the T2-VLA repository, start any checkpoint with this template:
+From the Tabero-VTLA repository, start any checkpoint with this template:
 
 ```bash
-cd /path/to/T2-VLA
+cd /path/to/Tabero-VTLA
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \
@@ -133,7 +133,7 @@ hf download NathanWu7/pi0_lora_tacfield_tabero \
 Start the tacfield service:
 
 ```bash
-cd /path/to/T2-VLA
+cd /path/to/Tabero-VTLA
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \
@@ -158,7 +158,7 @@ The client:
 
 ## Observation Fields
 
-The TacManip client sends both top-level keys and `observation/...` compatibility keys. T2-VLA currently reads the top-level keys.
+The TacManip client sends both top-level keys and `observation/...` compatibility keys. Tabero-VTLA currently reads the top-level keys.
 
 All modes send:
 
@@ -280,7 +280,7 @@ Useful tactile options:
   - The directory should contain `params/` and `assets/`.
 
 - **OpenPI server is unreachable**
-  - Check that the T2-VLA service is still running.
+  - Check that the Tabero-VTLA service is still running.
   - Check that server `--port` and client `--server_port` match.
   - If running across machines, pass the server machine's IP with `--server_host` instead of relying on `127.0.1.1`.
 
@@ -288,5 +288,5 @@ Useful tactile options:
 
 For Tabero model training, fine-tuning, and OpenPI service-side code, see:
 
-- [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA)
+- [`NathanWu7/Tabero-VTLA`](https://github.com/NathanWu7/Tabero-VTLA)
 - Upstream reference: [`Physical-Intelligence/openpi`](https://github.com/Physical-Intelligence/openpi)

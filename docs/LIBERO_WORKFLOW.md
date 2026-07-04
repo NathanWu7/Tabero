@@ -167,12 +167,12 @@ find -L benchmarks/datasets/libero/video_datasets -maxdepth 2 -name '*.mp4' | wc
 
 `openpi_inference_client.py` 是本仓库的 client。真正的模型推理服务需要先在 OpenPI service 仓库侧启动。
 
-Tabero 当前对应的修改版 OpenPI service 推荐使用 [`NathanWu7/T2-VLA`](https://github.com/NathanWu7/T2-VLA)。该仓库负责模型训练/推理服务侧；本仓库负责 Isaac Lab 环境和 `benchmarks/openpi/openpi_inference_client.py` 这个 Isaac 侧 client。对应权重见 [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero)。
+Tabero 当前对应的修改版 OpenPI service 推荐使用 [`NathanWu7/Tabero-VTLA`](https://github.com/NathanWu7/Tabero-VTLA)。该仓库负责模型训练/推理服务侧；本仓库负责 Isaac Lab 环境和 `benchmarks/openpi/openpi_inference_client.py` 这个 Isaac 侧 client。对应权重见 [`NathanWu7/pi0_lora_tacfield_tabero`](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero)。
 
-在 T2-VLA 仓库中启动 service 的模板如下：
+在 Tabero-VTLA 仓库中启动 service 的模板如下：
 
 ```bash
-cd /path/to/T2-VLA
+cd /path/to/Tabero-VTLA
 uv run python scripts/serve_policy.py \
   --port 8000 \
   policy:checkpoint \
@@ -205,10 +205,10 @@ hf download NathanWu7/pi0_lora_notac_tabero \
   --include 'norm_stats/**'
 ```
 
-在 T2-VLA 仓库中启动 no-tactile OpenPI service：
+在 Tabero-VTLA 仓库中启动 no-tactile OpenPI service：
 
 ```bash
-cd /path/to/T2-VLA
+cd /path/to/Tabero-VTLA
 
 CUDA_VISIBLE_DEVICES=0 \
 JAX_PLATFORMS=cuda \

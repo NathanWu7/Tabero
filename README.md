@@ -12,7 +12,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-yellow?style=flat-square&logo=python)](https://www.python.org/)
 [![Isaac Sim](https://img.shields.io/badge/Isaac%20Sim-5.0%2B-orange?style=flat-square&logo=nvidia)](https://developer.nvidia.com/isaac-sim)
 [![Isaac Lab](https://img.shields.io/badge/Isaac%20Lab-2.2%2B-red?style=flat-square)](https://isaac-sim.github.io/IsaacLab/)
-[![Code](https://img.shields.io/badge/Code-GitHub-black?style=flat-square&logo=github)](https://github.com/NathanWu7/T2-VLA)
+[![Code](https://img.shields.io/badge/Code-GitHub-black?style=flat-square&logo=github)](https://github.com/NathanWu7/Tabero-VTLA)
 [![Dataset](https://img.shields.io/badge/Dataset-Zenodo-purple?style=flat-square&logo=zenodo)](https://zenodo.org/records/19250783)
 
 [📄 Paper](https://arxiv.org/abs/2605.27886) •
@@ -148,7 +148,7 @@ ln -sfn /path/to/Tactile_manipulation_dataset source/tac_manip/tac_manip/assets/
 huggingface-cli download NathanWu7/pi0_lora_tacfield_tabero \
   --local-dir /path/to/pi0_lora_tacfield_tabero
 
-# Start the model server (from the T2-VLA repository)
+# Start the model server (from the Tabero-VTLA repository)
 # Then run evaluation:
 python benchmarks/openpi/openpi_inference_client.py
 
@@ -158,7 +158,7 @@ python scripts/tools/run_task_evaluations.py
 
 ### Training
 
-Model training code is maintained in the companion repository **[NathanWu7/T2-VLA](https://github.com/NathanWu7/T2-VLA)**. This repository provides the Isaac Lab environments, data conversion tools, and inference client.
+Model training code is maintained in the companion repository **[NathanWu7/Tabero-VTLA](https://github.com/NathanWu7/Tabero-VTLA)**. This repository provides the Isaac Lab environments, data conversion tools, and inference client.
 
 ---
 
@@ -258,7 +258,7 @@ Detailed workflow documentation is organized under [`docs/`](docs/):
 
 | Repository | Description |
 |:---|:---|
-| [NathanWu7/T2-VLA](https://github.com/NathanWu7/T2-VLA) | Tabero VTLA model training and serving code |
+| [NathanWu7/Tabero-VTLA](https://github.com/NathanWu7/Tabero-VTLA) | Tabero VTLA model training and serving code |
 | [NathanWu7/pi0_lora_tacfield_tabero](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero) | Pre-trained LoRA model weights |
 | [NathanWu7/Isaaclab_Libero](https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero) | LIBERO benchmark data for Isaac Lab |
 | [china-sae-robotics/Tactile_Manipulation_Dataset](https://huggingface.co/datasets/china-sae-robotics/Tactile_Manipulation_Dataset) | Tactile calibration dataset |
@@ -294,7 +294,7 @@ This project is released under the [Apache License 2.0](LICENCE).
 ---
 
 <div align="center">
-  <sub>🤖 Built with <a href="https://developer.nvidia.com/isaac-sim">Isaac Sim</a> · <a href="https://isaac-sim.github.io/IsaacLab/">Isaac Lab</a> · <a href="https://github.com/NathanWu7/T2-VLA">T2-VLA</a></sub>
+  <sub>🤖 Built with <a href="https://developer.nvidia.com/isaac-sim">Isaac Sim</a> · <a href="https://isaac-sim.github.io/IsaacLab/">Isaac Lab</a> · <a href="https://github.com/NathanWu7/Tabero-VTLA">Tabero-VTLA</a></sub>
   <br/>
   <sub>English | <a href="docs/README.zh-CN.md">中文</a></sub>
 </div>
