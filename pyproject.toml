@@ -36,7 +36,7 @@ extra_standard_library = [
     "toml",
     "trimesh",
     "tqdm",
-    "tyro"
+    "tyro",
     "psutil",
 ]
 known_thirdparty = [

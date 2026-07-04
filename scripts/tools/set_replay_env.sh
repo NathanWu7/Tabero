@@ -147,13 +147,6 @@ else
   fi
 fi
 
-#
-# IMPORTANT:
-# replay_utils.py uses string concatenation for `root_dir_prefix` (expects a trailing slash),
-# e.g. base = f"{root_dir_prefix}{task_suite}_task{task_id}".
-# Therefore OUTPUT_REPLAYED_VIDEOS_DIR MUST end with '/' to avoid paths like:
-#   video_datasetslibero_goal_task0/...
-#
 export OUTPUT_REPLAYED_DEMOS_DIR="${ROOT}/replayed_demos/"
 export OUTPUT_REPLAYED_VIDEOS_DIR="${ROOT}/video_datasets/"
 
@@ -196,5 +189,4 @@ if [[ "${PROFILE_KIND}" == "libero" ]]; then
   echo "      export OUTPUT_REPLAYED_VIDEOS_DIR=/path/to/my_libero_replay/video_datasets"
   echo "      export REPLAYED_DEMOS_DIR=\"\$OUTPUT_REPLAYED_DEMOS_DIR\""
 fi
-
 

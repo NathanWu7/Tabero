@@ -69,6 +69,23 @@ source scripts/tools/set_replay_env.sh libero
 
 注意：如果你不想覆盖下载数据里的 `replayed_demos/` 和 `video_datasets/`，请在重收集前手动指定单独输出目录。重收集流程放在本文后半部分。
 
+### 可选：reset 时随机化光照
+
+默认情况下，Libero 环境保持确定性光照，便于 replay / evaluation 复现。如果需要在不同光照条件下重新采集或评测，可以在 replay、OpenPI 推理或批量评测命令中加入 `--randomize_light`：
+
+```bash
+python benchmarks/openpi/openpi_inference_client.py \
+  --control_mode diffik \
+  --task_suite libero_goal \
+  --task_id 1 \
+  --num_total_experiments 1 \
+  --max_inference_steps 30 \
+  --randomize_light \
+  --headless
+```
+
+运行逻辑：脚本先设置 `LIBERO_RANDOMIZE_LIGHT=1`，`setup_task_objects()` 再设置 `TASK_SUITE` 和 `TASK_ID`，随后 `parse_env_cfg()` 实例化 Libero cfg。`EventCfgFrankaPanda` 只在该 flag 开启时注册 `randomize_light` reset 事件；每次 `env.reset()` 时，该事件会随机化 `/World/light` DomeLight 的强度、颜色和 HDR 纹理。Contact-force 和 tactile Libero 环境继承同一套基础 Franka Libero event 配置，不需要重复定义事件。
+
 ## 3. 直接转换成 LeRobot / OpenPI 训练格式
 
 LeRobot/OpenPI 转换请在隔离的 `tabero_lerobot` 环境中运行，不要在 Isaac 运行环境中运行。`lerobot` 会引入一组可能和 Isaac Sim / Isaac Lab 钉死版本冲突的依赖，因此不要把它装回 Isaac 运行环境。

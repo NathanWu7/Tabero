@@ -69,6 +69,23 @@ This profile points the following variables to the default `benchmarks/datasets/
 
 If you do not want to overwrite the downloaded `replayed_demos/` and `video_datasets/`, manually set separate output directories before recollection. The recollection workflow is intentionally placed later in this guide.
 
+### Optional: Reset-Time Light Randomization
+
+By default, Libero environments keep deterministic lighting for reproducibility. To evaluate or recollect under varied lighting, add `--randomize_light` to replay, OpenPI inference, or batch evaluation commands:
+
+```bash
+python benchmarks/openpi/openpi_inference_client.py \
+  --control_mode diffik \
+  --task_suite libero_goal \
+  --task_id 1 \
+  --num_total_experiments 1 \
+  --max_inference_steps 30 \
+  --randomize_light \
+  --headless
+```
+
+Runtime flow: the script sets `LIBERO_RANDOMIZE_LIGHT=1`, `setup_task_objects()` sets `TASK_SUITE` and `TASK_ID`, then `parse_env_cfg()` instantiates the Libero cfg. `EventCfgFrankaPanda` registers `randomize_light` only when the flag is enabled, and the reset event randomizes `/World/light` DomeLight intensity, color, and HDR texture on every `env.reset()`. Contact-force and tactile Libero environments inherit the same event configuration from the base Franka Libero cfg.
+
 ## 3. Convert Directly to LeRobot / OpenPI Training Format
 
 Run the LeRobot/OpenPI conversion in the isolated `tabero_lerobot` environment, not in the Isaac runtime environment. `lerobot` pulls dependencies that can conflict with Isaac Sim / Isaac Lab pins, so do not install it back into the Isaac runtime environment.

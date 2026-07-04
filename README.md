@@ -156,5 +156,6 @@ The exported package snapshot for the local `tabero` conda environment is kept a
 - Standard LIBERO data usually uses 7D/8D task-space actions.
 - ContactForce and tactile Tabero data use 13D `7dpf` actions when force is included.
 - The OpenPI client sends RGB images, wrist images, task-space state, language prompt, and optional force/tactile fields to the model server.
+- Libero light randomization is off by default for reproducibility. Add `--randomize_light` to replay or evaluation commands to randomize DomeLight intensity, color, and HDR texture on each environment reset.
 
 For exact command templates and troubleshooting, use the dedicated documentation under `docs/`.

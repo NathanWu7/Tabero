@@ -34,6 +34,7 @@ from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
 from isaaclab.sim.schemas.schemas_cfg import RigidBodyPropertiesCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import UsdFileCfg
 from isaaclab.utils import configclass
+from isaaclab.utils.assets import NVIDIA_NUCLEUS_DIR
 from isaaclab_tasks.manager_based.manipulation.stack.mdp import franka_stack_events
 
 from tac_manip.tasks.manipulation.libero import mdp
@@ -85,6 +86,27 @@ class LiberoTaskConfig:
             self.tactile_targets = self.task_info.get("tactile_targets", self.obj_of_interest)
 
 
+def _env_flag_enabled(name: str, default: bool = False) -> bool:
+    value = os.getenv(name, "1" if default else "0").strip().lower()
+    return value in ("1", "true", "t", "yes", "y", "on")
+
+
+def _libero_domelight_textures() -> list[str]:
+    return [
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Cloudy/abandoned_parking_4k.hdr",
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Cloudy/evening_road_01_4k.hdr",
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Cloudy/lakeside_4k.hdr",
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/autoshop_01_4k.hdr",
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/carpentry_shop_01_4k.hdr",
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/hospital_room_4k.hdr",
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/hotel_room_4k.hdr",
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/old_bus_depot_4k.hdr",
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/small_empty_house_4k.hdr",
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/surgery_4k.hdr",
+        f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Studio/photo_studio_01_4k.hdr",
+    ]
+
+
 @configclass
 class EventCfgFrankaPanda:
     """Configuration for events."""
@@ -112,31 +134,21 @@ class EventCfgFrankaPanda:
     # Create individual event terms for each object
     def __post_init__(self):
         libero_config = LiberoTaskConfig()
-                # self.randomize_light = EventTerm(
-        #     func=mdp.randomize_domelight_color_intensity,
-        #     mode="reset",
-        #     params={
-        #         "intensity_range": (500, 700),
-        #         "color_variation": 0.4,
-        #         "base_color": (0.75, 0.75, 0.75),
-        #         "default_intensity": 600.0,
-        #         "asset_cfg": SceneEntityCfg("light"),
-        #         "textures": [
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Cloudy/abandoned_parking_4k.hdr",
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Cloudy/evening_road_01_4k.hdr",
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Cloudy/lakeside_4k.hdr",
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/autoshop_01_4k.hdr",
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/carpentry_shop_01_4k.hdr",
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/hospital_room_4k.hdr",
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/hotel_room_4k.hdr",
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/old_bus_depot_4k.hdr",
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/small_empty_house_4k.hdr",
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Indoor/surgery_4k.hdr",
-        #             # f"{NVIDIA_NUCLEUS_DIR}/Assets/Skies/Studio/photo_studio_01_4k.hdr",
-        #         ],
-        #         "default_texture": f"{ASSETS_DATA_DIR}/Scenes/1.jpeg",
-        #     },
-        # )
+        if _env_flag_enabled("LIBERO_RANDOMIZE_LIGHT"):
+            self.randomize_light = EventTerm(
+                func=mdp.randomize_domelight_color_intensity,
+                mode="reset",
+                params={
+                    "intensity_range": (0.0, 1000.0),
+                    "color_variation": 0.4,
+                    "base_color": (0.75, 0.75, 0.75),
+                    "default_intensity": 200.0,
+                    "asset_cfg": SceneEntityCfg("light"),
+                    "textures": _libero_domelight_textures(),
+                    "default_texture": "",
+                },
+            )
+
         # Create event terms for each object
         for obj in libero_config.objects.items():
             obj_name = obj[0]
@@ -979,4 +991,3 @@ class OscPoseLiberoCameraEnvCfg(JointPositionLiberoCameraEnvCfg):
         self.teleop_devices.devices['keyboard'].rot_sensitivity = 0.5
         self.teleop_devices.devices['spacemouse'].pos_sensitivity = 1.0
         self.teleop_devices.devices['spacemouse'].rot_sensitivity = 0.5
-

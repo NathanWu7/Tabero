@@ -150,6 +150,7 @@ class DataReplayEvalConfig:
     # Simulation parameters
     headless: bool = True
     validate_states: bool = False  # Validate state consistency
+    randomize_light: bool = False
     
     # Task configuration
     task_suite: Optional[str] = None  # For compatibility with setup_task_objects
@@ -253,6 +254,9 @@ def run_single_replay_evaluation(
     # Add state validation flag
     if config.validate_states and config.num_envs == 1:
         cmd.append("--validate_states")
+
+    if config.randomize_light:
+        cmd.append("--randomize_light")
     
     # Print command (verbose mode could be added later)
     # print(f"Running command: {' '.join(cmd)}")
@@ -908,4 +912,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

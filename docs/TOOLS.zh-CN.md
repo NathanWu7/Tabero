@@ -36,7 +36,34 @@
 - `run_data_evaluations.py`：会对每个 task 反复调用 `replay_demos.py`（子进程），解析 stdout 统计 success/metrics，直到累计 episode 达到 `max_episodes`。
 - `run_task_evaluations.py`：会对每个 task 调用 OpenPI（或其它 policy）推理脚本（子进程），解析 stdout 得到成功率与力学指标。
 
-### 3）“精简指令 vs 全指令”怎么理解
+### 3）可选 Libero 光照随机化
+
+默认不启用光照随机化，以保持 replay / evaluation 可复现。如果需要在每次 `env.reset()` 时随机化 `/World/light` 的 DomeLight 强度、颜色和 HDR 天空纹理，在 replay 或 evaluation 命令里加 `--randomize_light`：
+
+```bash
+python scripts/tools/replay_demos.py \
+  --task Isaac-Libero-Franka-Replay-Camera-v0 \
+  --task_suite libero_goal \
+  --task_id 1 \
+  --randomize_light \
+  --headless
+```
+
+运行逻辑：脚本先把 `LIBERO_RANDOMIZE_LIGHT=1` 写入环境变量；随后 `setup_task_objects()` 设置 `TASK_SUITE/TASK_ID`；`parse_env_cfg()` 实例化 Libero cfg；`EventCfgFrankaPanda` 只在该 flag 开启时注册 `randomize_light` reset 事件。ContactForce / Tactile Libero 环境继承同一套基础 Franka Libero event 配置，不需要重复写事件。
+
+批量评测脚本也支持同一参数，并会透传给子进程：
+
+```bash
+python scripts/tools/run_task_evaluations.py \
+  --policy_model openpi \
+  --control_mode tactile \
+  --task_suites libero_goal \
+  --task_ids 1 \
+  --randomize_light \
+  --headless
+```
+
+### 4）“精简指令 vs 全指令”怎么理解
 
 - **精简指令**：最少参数、适合快速跑通（默认依赖当前 shell 的环境变量/默认值）
 - **全指令**：把关键环境变量、输出路径、与常用可选参数都显式写出来，便于复现与团队协作

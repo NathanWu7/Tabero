@@ -28,7 +28,34 @@ Keep input directories and output directories separate.
 - `run_data_evaluations.py`: launches `replay_demos.py` for each task, parses stdout, and aggregates success/metric results until `max_episodes` is reached.
 - `run_task_evaluations.py`: launches the OpenPI or other policy inference client for each task and parses stdout for success rate and force metrics.
 
-### 3. Short Commands Versus Full Commands
+### 3. Optional Libero Light Randomization
+
+Libero DomeLight randomization is disabled by default. Add `--randomize_light` to replay or evaluation commands when you want reset-time randomization of intensity, color, and HDR sky texture.
+
+```bash
+python scripts/tools/replay_demos.py \
+  --task Isaac-Libero-Franka-Replay-Camera-v0 \
+  --task_suite libero_goal \
+  --task_id 1 \
+  --randomize_light \
+  --headless
+```
+
+The CLI flag sets `LIBERO_RANDOMIZE_LIGHT=1` before the environment cfg is parsed. `EventCfgFrankaPanda` then registers the `randomize_light` reset event; tactile and contact-force Libero environments inherit the same event wiring from the base Franka Libero cfg.
+
+Batch wrappers also accept the same flag and pass it to child processes:
+
+```bash
+python scripts/tools/run_task_evaluations.py \
+  --policy_model openpi \
+  --control_mode tactile \
+  --task_suites libero_goal \
+  --task_ids 1 \
+  --randomize_light \
+  --headless
+```
+
+### 4. Short Commands Versus Full Commands
 
 - **Short commands** use minimal arguments and rely on the current shell environment/defaults.
 - **Full commands** spell out important paths and common options, which is better for reproducibility and team use.
