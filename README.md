@@ -16,7 +16,7 @@
 [![Dataset](https://img.shields.io/badge/Dataset-Zenodo-purple?style=flat-square&logo=zenodo)](https://zenodo.org/records/19250783)
 
 [📄 Paper](https://arxiv.org/abs/2605.27886) •
-[📦 Assets](https://zenodo.org/records/19250783) •
+[📦 Assets](https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero) •
 [🖐️ Tactile Assets](https://huggingface.co/datasets/china-sae-robotics/Tactile_Manipulation_Dataset) •
 [🤗 Model Weights](https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero)
 
