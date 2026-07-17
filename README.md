@@ -147,6 +147,8 @@ huggingface-cli download NathanWu7/pi0_lora_tacfield_tabero \
   --local-dir /path/to/pi0_lora_tacfield_tabero
 
 # Start the model server (from the Tabero-VTLA repository)
+# bash server.sh pi0_lora_tacfield_tabero 49999    #49999 denotes to the training step
+
 # Then run evaluation:
 python benchmarks/openpi/openpi_inference_client.py
 
