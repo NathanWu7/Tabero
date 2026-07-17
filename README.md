@@ -54,17 +54,17 @@ Tabero-VTLA modulates grip force according to natural language instructions. Wat
 </tr>
 </table>
 
-### 🍮 Task 7: Pick up the chocolate pudding → Place in basket
+### 🍮 Task 7: Pick up the milk → Place in basket
 
 <table>
 <tr>
 <td width="50%" align="center">
   <img src="docs/assets/task7_firm_success.gif" width="100%" alt="Firm Success"/><br/>
-  <sub>🔴 <b>Firm</b> — "Tightly pick up the chocolate pudding and place it in the basket."<br/>Standard force level applied ✓</sub>
+  <sub>🔴 <b>Firm</b> — "Tightly pick up the milk and place it in the basket."<br/>Standard force level applied ✓</sub>
 </td>
 <td width="50%" align="center">
   <img src="docs/assets/task7_gentle_success.gif" width="100%" alt="Gentle Success"/><br/>
-  <sub>🟢 <b>Gentle</b> — "Softly pick up the chocolate pudding and place it in the basket."<br/>Force reduced by ~70% while maintaining stable grasping ✓</sub>
+  <sub>🟢 <b>Gentle</b> — "Softly pick up the milk and place it in the basket."<br/>Force reduced by ~70% while maintaining stable grasping ✓</sub>
 </td>
 </tr>
 </table>
