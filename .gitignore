@@ -24,6 +24,8 @@
 **/output/*
 **/outputs/*
 **/videos/*
+!static/videos/
+!static/videos/*.mp4
 **/wandb/*
 **/.neptune/*
 evaluation_results/
