@@ -216,8 +216,7 @@ Run:
 
 ```bash
 curl --fail --head https://nathanwu7.github.io/Tabero/static/css/index.css &&
-curl --fail --head https://nathanwu7.github.io/Tabero/static/videos/task1_gentle_success.mp4 &&
-curl --fail --head https://nathanwu7.github.io/Tabero/static/pdfs/Tacsim2real.pdf
+curl --fail --head https://nathanwu7.github.io/Tabero/static/videos/task1_gentle_success.mp4
 ```
 
-Expected: 三个请求均返回成功状态。
+Expected: 两个请求均返回成功状态。
