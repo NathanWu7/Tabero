@@ -11,7 +11,7 @@
 [![Isaac Sim](https://img.shields.io/badge/Isaac%20Sim-5.0%2B-orange?style=flat-square&logo=nvidia)](https://developer.nvidia.com/isaac-sim)
 [![Isaac Lab](https://img.shields.io/badge/Isaac%20Lab-2.2%2B-red?style=flat-square)](https://isaac-sim.github.io/IsaacLab/)
 [![Code](https://img.shields.io/badge/Code-GitHub-black?style=flat-square&logo=github)](https://github.com/NathanWu7/Tabero-VTLA)
-[![Dataset](https://img.shields.io/badge/Dataset-Zenodo-purple?style=flat-square&logo=zenodo)](https://zenodo.org/records/19250783)
+[![Dataset](https://img.shields.io/badge/Dataset-Hugging%20Face-yellow?style=flat-square&logo=huggingface)](https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero)
 
 [📄 Paper](https://arxiv.org/abs/2605.27886) •
 [📦 Assets](https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero) •

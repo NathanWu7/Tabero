@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="title" content="Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback from Vision, Touch, and Language">
+  <meta name="description" content="Tabero introduces a benchmark and model suite for gentle, language-conditioned robotic manipulation with tactile feedback, reducing grip force by over 70% while maintaining high task success.">
+  <meta name="keywords" content="tactile sensing, gentle manipulation, vision-language-action, force feedback, robotic manipulation, VTLA, tactile simulation">
+  <meta name="author" content="Qiwei Wu, Rui Zhang, Xin Xiang, Tao Li, Weihua Zhang, Junjie Lai, Renjing Xu">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Tabero Project">
+  <meta property="og:title" content="Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback from Vision, Touch, and Language">
+  <meta property="og:description" content="Tabero introduces a benchmark and model suite for gentle, language-conditioned robotic manipulation with tactile feedback.">
+  <meta property="og:url" content="https://nathanwu7.github.io/tabero/">
+
+  <meta name="citation_title" content="Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback from Vision, Touch, and Language">
+  <meta name="citation_author" content="Qiwei Wu">
+  <meta name="citation_author" content="Rui Zhang">
+  <meta name="citation_author" content="Xin Xiang">
+  <meta name="citation_author" content="Tao Li">
+  <meta name="citation_author" content="Weihua Zhang">
+  <meta name="citation_author" content="Junjie Lai">
+  <meta name="citation_author" content="Renjing Xu">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="ICML 2026">
+  <meta name="citation_arxiv_id" content="2605.27886">
+
+  <meta name="theme-color" content="#2563eb">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://ajax.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <title>Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback from Vision, Touch, and Language</title>
+
+  <link rel="icon" type="image/x-icon" href="static/images/tabero.ico">
+  <link rel="apple-touch-icon" href="static/images/tabero.ico">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+  <noscript>
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <style>
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .video-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .video-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .video-card video {
+      width: 100%;
+      display: block;
+    }
+    .video-card .card-content {
+      padding: 1rem 1.25rem;
+    }
+    .video-card .card-content h4 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+    .video-card .card-content p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: #666;
+    }
+    .tag-success {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .tag-firm { background: #fee2e2; color: #dc2626; }
+    .tag-gentle { background: #d1fae5; color: #059669; }
+    .tag-pass { background: #dbeafe; color: #2563eb; }
+    .tag-fail { background: #fef3c7; color: #d97706; }
+
+    .highlight-box {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    .highlight-item {
+      text-align: center;
+      min-width: 160px;
+    }
+    .highlight-item .number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #2563eb;
+      line-height: 1.1;
+    }
+    .highlight-item .label {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 0.25rem;
+    }
+
+    .contribution-list {
+      text-align: left;
+      max-width: 800px;
+      margin: 1.5rem auto 0;
+    }
+    .contribution-list li {
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+    .contribution-list li strong {
+      color: #2563eb;
+    }
+
+    .video-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .sim2real-subsection {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .sim2real-gallery {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 2.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .sim2real-pair {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+    }
+    .sim2real-item {
+      width: 200px;
+      text-align: center;
+    }
+    .sim2real-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: block;
+    }
+    .sim2real-caption {
+      margin-top: 0.45rem;
+      font-size: 0.8rem;
+      color: #666;
+    }
+    @media (max-width: 768px) {
+      .video-comparison {
+        grid-template-columns: 1fr;
+      }
+      .video-grid {
+        grid-template-columns: 1fr;
+      }
+      .sim2real-gallery {
+        gap: 1rem;
+      }
+      .sim2real-pair {
+        gap: 0.5rem;
+      }
+      .sim2real-item {
+        width: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback from Vision, Touch, and Language</h1>
+            <div class="is-size-5 anonymous-authors">
+              <span class="author-block">Qiwei Wu, Rui Zhang, Xin Xiang, Tao Li, Weihua Zhang, Junjie Lai, Renjing Xu</span>
+            </div>
+
+            <div class="is-size-5 anonymous-authors">
+              <span class="author-block">ICML 2026</span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/2605.27886" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://github.com/NathanWu7/Tabero" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-database"></i>
+                  </span>
+                  <span>Assets</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://huggingface.co/datasets/china-sae-robotics/Tactile_Manipulation_Dataset" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-hand-paper"></i>
+                  </span>
+                  <span>Tactile Assets</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://huggingface.co/NathanWu7/pi0_lora_tacfield_tabero" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-cube"></i>
+                  </span>
+                  <span>Model Weights</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="static/pdfs/Tacsim2real.pdf" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Tactile Sim2Real</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teaser video -->
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <video poster="" id="teaser" autoplay controls muted loop height="100%" preload="metadata">
+          <source src="static/videos/task1_gentle_success.mp4" type="video/mp4">
+        </video>
+        <h2 class="subtitle has-text-centered" style="margin-top: 1rem;">
+          Tabero enables robots to gently manipulate objects through closed-loop tactile force feedback,
+          adjusting grip force based on natural language instructions like "gently" or "firmly".
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Tactile sensing is essential for robots to achieve human-like gentle manipulation capabilities. However, existing Vision-Language-Action (VLA) models struggle to exploit tactile feedback for gentle manipulation due to the scarcity of aligned vision-tactile-language data and the lack of effective closed-loop force feedback mechanisms. To address these challenges, we introduce <strong>Tabero</strong>, a benchmark and model suite for gentle, language-conditioned robotic manipulation that demands fine-grained contact force perception. First, the Tabero benchmark addresses the scarcity of tactile data by presenting a data-efficient pipeline that repurposes open-source robot manipulation trajectories to generate a diverse set of vision-tactile-language tasks, and establishes a multidimensional evaluation protocol that measures task success alongside physical interaction quality. Second, we propose <strong>Tabero-VTLA</strong>, a Vision-Tactile-Language-Action architecture featuring a decoupled force-position command interface; the resulting force-position commands are executed by a fixed hybrid controller to enable real-time, force-aware manipulation. Evaluated on Tabero, our model maintains high task success while reducing average grip force by over 70% under gentle instructions, demonstrating its ability to modulate interaction forces based on multimodal experience.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contributions -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Key Contributions</h2>
+          <ul class="contribution-list">
+            <li>
+              <strong>Tabero Benchmark:</strong> A scalable pipeline that repurposes open-source robot trajectories in a high-fidelity tactile simulator (Isaac Lab + Taxim/FOTS) to generate diverse vision-tactile-language datasets, along with the first standardized protocol for quantifying gentleness in language-conditioned manipulation.
+            </li>
+            <li>
+              <strong>Tabero-VTLA:</strong> A suite of force-aware VLA models that introduce a decoupled force-position command interface, enabling substantially reduced contact forces while preserving high task success through closed-loop tactile feedback.
+            </li>
+            <li>
+              <strong>Comprehensive Evaluation:</strong> New process-aware metrics (Average/Maximum Grip Force, Average/Maximum Applied Force) that go beyond binary success rates to assess the quality of physical interaction.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Video Results: Gentle vs. Firm Comparison -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Model Inference Results</h2>
+      <p class="has-text-centered" style="margin-bottom: 0.5rem; color: #555;">
+        Tabero-VTLA modulates grip force according to natural language instructions. Below we show the model executing the same task under different force instructions.
+      </p>
+
+      <!-- Task 1 Comparison -->
+      <h3 class="title is-4" style="margin-top: 2.5rem; margin-bottom: 0.5rem;">
+        Task: Pick up the cream cheese and place it in the basket
+      </h3>
+
+      <div class="video-comparison">
+        <div class="video-card">
+          <video controls muted loop preload="metadata">
+            <source src="static/videos/task1_gentle_success.mp4" type="video/mp4">
+          </video>
+          <div class="card-content">
+            <h4><span class="tag-success tag-gentle">Gentle</span> <span class="tag-success tag-pass">Success</span></h4>
+            <p>Instruction: "<em>Gently</em> pick up the cream cheese and place it in the basket." Significantly reduced grip force while completing the task.</p>
+          </div>
+        </div>
+        <div class="video-card">
+          <video controls muted loop preload="metadata">
+            <source src="static/videos/task1_gentle_failure.mp4" type="video/mp4">
+          </video>
+          <div class="card-content">
+            <h4><span class="tag-success tag-gentle">Gentle</span> <span class="tag-success tag-fail">Failure Case</span></h4>
+            <p>Under extreme low-force conditions (10%), the object slips due to insufficient grip — illustrating the inherent trade-off between gentleness and reliability.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task 7 Comparison -->
+      <h3 class="title is-4" style="margin-top: 2.5rem; margin-bottom: 0.5rem;">
+        Task: Pick up the chocolate pudding and place it in the basket
+      </h3>
+
+      <div class="video-comparison">
+        <div class="video-card">
+          <video controls muted loop preload="metadata">
+            <source src="static/videos/task7_firm_success.mp4" type="video/mp4">
+          </video>
+          <div class="card-content">
+            <h4><span class="tag-success tag-firm">Firm</span> <span class="tag-success tag-pass">Success</span></h4>
+            <p>Instruction: "<em>Tightly</em> pick up the chocolate pudding and place it in the basket." Standard force level applied.</p>
+          </div>
+        </div>
+
+        <div class="video-card">
+          <video controls muted loop preload="metadata">
+            <source src="static/videos/task7_gentle_success.mp4" type="video/mp4">
+          </video>
+          <div class="card-content">
+            <h4><span class="tag-success tag-gentle">Gentle</span> <span class="tag-success tag-pass">Success</span></h4>
+            <p>Instruction: "<em>Softly</em> pick up the chocolate pudding and place it in the basket." Force reduced by ~70% while maintaining stable grasping.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Real-World Experiments -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Real-World Experiments</h2>
+      <div class="sim2real-subsection">
+        <h3 class="title is-4">Tactile Sim2Real</h3>
+        <p class="has-text-centered" style="color: #555; margin-bottom: 0.5rem;">
+          In real-robot testing, we use Xense tactile sensors; below is a side-by-side comparison between our tactile simulation and real-world observations.
+        </p>
+        <div class="sim2real-gallery">
+          <div class="sim2real-pair">
+            <div class="sim2real-item">
+              <img src="static/images/left_sim.png" alt="Left tactile simulation">
+              <p class="sim2real-caption">Left Sim</p>
+            </div>
+            <div class="sim2real-item">
+              <img src="static/images/left_real.png" alt="Left real tactile observation">
+              <p class="sim2real-caption">Left Real</p>
+            </div>
+          </div>
+          <div class="sim2real-pair">
+            <div class="sim2real-item">
+              <img src="static/images/right_sim.png" alt="Right tactile simulation">
+              <p class="sim2real-caption">Right Sim</p>
+            </div>
+            <div class="sim2real-item">
+              <img src="static/images/right_real.png" alt="Right real tactile observation">
+              <p class="sim2real-caption">Right Real</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h3 class="title is-4 has-text-centered" style="margin-top: 2.5rem;">Real-World Demonstrations</h3>
+      <div class="sim2real-gallery" style="margin-bottom: 1rem;">
+        <div class="sim2real-pair" style="gap: 1.5rem; width: 100%; justify-content: center;">
+          <div class="sim2real-item" style="width: 46%; max-width: 460px;">
+            <img src="static/images/real_cube.png" alt="Cube real-world observation">
+            <p class="sim2real-caption">Real World</p>
+          </div>
+          <div class="sim2real-item" style="width: 46%; max-width: 460px;">
+            <img src="static/images/sim_cube.png" alt="Cube simulation">
+            <p class="sim2real-caption">Simulation</p>
+          </div>
+        </div>
+      </div>
+      <p class="has-text-centered" style="margin-bottom: 1.5rem; color: #555;">
+        We provide real-robot data demonstrations to show that the sim-to-real gap is small, and this example will be continuously updated in the codebase.
+      </p>
+      <div class="video-comparison">
+        <div class="video-card">
+          <video controls muted loop preload="metadata">
+            <source src="static/videos/cube_fix.mp4" type="video/mp4">
+          </video>
+          <div class="card-content">
+            <h4>Cube (Real Robot)</h4>
+            <p>This real-robot example demonstrates stable grasping on an object with a prismatic structure.</p>
+          </div>
+        </div>
+        <div class="video-card">
+          <video controls muted loop preload="metadata">
+            <source src="static/videos/real_cube.mp4" type="video/mp4">
+          </video>
+          <div class="card-content">
+            <h4>Cube (Simulation)</h4>
+            <p>This simulation example demonstrates replay-transferred real-robot trajectories on a cube object.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="video-comparison">
+        <div class="video-card">
+          <video controls muted loop preload="metadata">
+            <source src="static/videos/cup_fix.mp4" type="video/mp4">
+          </video>
+          <div class="card-content">
+            <h4>Cup (Real Robot)</h4>
+            <p>This real-robot example demonstrates reliable grasping behavior on an object with round geometry.</p>
+          </div>
+        </div>
+        <div class="video-card">
+          <video controls muted loop preload="metadata">
+            <source src="static/videos/real_cup.mp4" type="video/mp4">
+          </video>
+          <div class="card-content">
+            <h4>Cup (Simulation)</h4>
+            <p>This simulation example demonstrates replay-transferred real-robot trajectories on a cup object.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BibTeX -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <div class="bibtex-header">
+        <h2 class="title">BibTeX</h2>
+        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtex-code"><code>@misc{wu2026taberolearninggentlemanipulation,
+  title         = {Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback from Vision, Touch, and Language},
+  author        = {Qiwei Wu and Rui Zhang and Xin Xiang and Tao Li and Weihua Zhang and Junjie Lai and Renjing Xu},
+  year          = {2026},
+  eprint        = {2605.27886},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  url           = {https://arxiv.org/abs/2605.27886}
+}</code></pre>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+              This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  </main>
+</body>
+</html>
