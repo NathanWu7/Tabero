@@ -2,7 +2,7 @@
 
 ## 目标
 
-将现有 Tabero 静态项目页发布到独立 GitHub 仓库 `NathanWu7/tabero`，公开地址为 `https://nathanwu7.github.io/tabero/`，并在每次推送到 `main` 分支后通过 GitHub Actions 自动部署。
+将现有 Tabero 静态项目页发布到独立 GitHub 仓库 `NathanWu7/Tabero`，公开地址为 `https://nathanwu7.github.io/Tabero/`，并在每次推送到 `main` 分支后通过 GitHub Actions 自动部署。
 
 ## 范围
 
@@ -38,7 +38,7 @@ tabero/
 
 ## 路径兼容性
 
-页面资源使用 `static/...` 相对路径。浏览器访问 `/tabero/` 时，这些路径会解析为 `/tabero/static/...`，无需增加 `basePath` 或改写现有 HTML。
+页面资源使用 `static/...` 相对路径。浏览器访问 `/Tabero/` 时，这些路径会解析为 `/Tabero/static/...`，无需增加 `basePath` 或改写现有 HTML。
 
 ## 权限和仓库设置
 
@@ -52,7 +52,7 @@ tabero/
 - 本地启动简单静态 HTTP 服务，检查首页及主要图片、视频、PDF、CSS 和 JavaScript。
 - 验证仓库内不存在超过 GitHub 单文件限制的资源；当前站点总计约 22 MB，最大文件远低于 100 MB。
 - 推送后确认 Actions 成功完成。
-- 检查 `https://nathanwu7.github.io/tabero/` 返回页面，并抽查静态资源与视频播放。
+- 检查 `https://nathanwu7.github.io/Tabero/` 返回页面，并抽查静态资源与视频播放。
 
 ## 风险与处理
 

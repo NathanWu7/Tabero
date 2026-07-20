@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 将 Tabero 静态网站从独立仓库自动发布到 `https://nathanwu7.github.io/tabero/`。
+**Goal:** 将 Tabero 静态网站从独立仓库自动发布到 `https://nathanwu7.github.io/Tabero/`。
 
 **Architecture:** 现有 Tabero 代码仓库的根目录同时保存无需构建的静态项目页。GitHub Actions 仅将 `index.html`、`.nojekyll` 和 `static/` 复制到临时 `_site` 目录并打包为 Pages artifact，避免发布仓库源码。
 
@@ -204,7 +204,7 @@ Expected: 最新运行最终状态为 `completed success`。
 
 - [ ] **Step 2: 检查 Pages 地址**
 
-Run: `curl --fail --retry 6 --retry-delay 10 https://nathanwu7.github.io/tabero/`
+Run: `curl --fail --retry 6 --retry-delay 10 https://nathanwu7.github.io/Tabero/`
 
 Expected: 返回 Tabero 页面 HTML。
 
@@ -213,9 +213,9 @@ Expected: 返回 Tabero 页面 HTML。
 Run:
 
 ```bash
-curl --fail --head https://nathanwu7.github.io/tabero/static/css/index.css &&
-curl --fail --head https://nathanwu7.github.io/tabero/static/videos/task1_gentle_success.mp4 &&
-curl --fail --head https://nathanwu7.github.io/tabero/static/pdfs/Tacsim2real.pdf
+curl --fail --head https://nathanwu7.github.io/Tabero/static/css/index.css &&
+curl --fail --head https://nathanwu7.github.io/Tabero/static/videos/task1_gentle_success.mp4 &&
+curl --fail --head https://nathanwu7.github.io/Tabero/static/pdfs/Tacsim2real.pdf
 ```
 
 Expected: 三个请求均返回成功状态。
