@@ -254,6 +254,27 @@ class _OnlineTactileBuffer:
             self._marker_init = init_pos
         self._marker_hist.append(curr_pos)
 
+    def append_control_sample(
+        self,
+        obs: dict,
+        *,
+        env=None,
+        include_tactile: bool = False,
+        env_id: int = 0,
+    ) -> None:
+        """Append one synchronized sample from an observation-producing control step."""
+        self.update_force(obs)
+        if not include_tactile:
+            return
+        if env is None:
+            raise ValueError("env is required when include_tactile=True")
+        try:
+            self.update_tactile_frames(env, env_id=env_id)
+        except Exception:
+            # Preserve the existing behavior: unavailable tactile RGB must not stop evaluation.
+            pass
+        self.update_marker_motion(obs)
+
     def get_tactile_image(self) -> np.ndarray | None:
         if len(self._left_frames) == 0 or len(self._right_frames) == 0:
             return None
@@ -920,6 +941,12 @@ def run_closed_loop_policy(  # noqa: C901
 
             # Reset online histories per experiment to match dataset windowing.
             tactile_buf.reset()
+            tactile_buf.append_control_sample(
+                obs,
+                env=env,
+                include_tactile=args.control_mode in ("tactile", "binary"),
+                env_id=0,
+            )
 
             frame_count = 0
             terminated = torch.tensor([False])  # Initialize to handle case where inner loop doesn't execute
@@ -1001,16 +1028,6 @@ def run_closed_loop_policy(  # noqa: C901
 
                 # Base 7D state: [x, y, z, ax, ay, az, gripper_abs]
                 task_state_7 = np.concatenate((pos, axis_angle, gripper_scalar), axis=0).astype(np.float32)
-
-                # For Hybrid force–position control, compute finger force history (left/right, 3D each)
-                tactile_buf.update_force(obs)
-                if args.control_mode in ("tactile", "binary"):
-                    # Tactile modalities (Tabero-style): tactile_image + tactile_gripper_force + tactile_marker_motion
-                    try:
-                        tactile_buf.update_tactile_frames(env, env_id=0)
-                    except Exception:
-                        pass
-                    tactile_buf.update_marker_motion(obs)
 
                 # All modes: state is pure task-space 7D; forces are sent separately for hybrid
                 eef_pose_states = task_state_7
@@ -1171,6 +1188,12 @@ def run_closed_loop_policy(  # noqa: C901
                 num_actions_to_execute = min(action.shape[0], args.replan_steps)
                 for i in range(num_actions_to_execute):
                     obs, reward, terminated, truncated, info = env.step(action[i].reshape([1, -1]))
+                    tactile_buf.append_control_sample(
+                        obs,
+                        env=env,
+                        include_tactile=args.control_mode in ("tactile", "binary"),
+                        env_id=0,
+                    )
 
                     step_fL_pred = None
                     step_fR_pred = None
