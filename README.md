@@ -2,9 +2,7 @@
 
 <img src="docs/assets/poster_preview.png" alt="Tabero Overview" width="800"/>
 
-# 🤖 Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback
-
-### from Vision, Touch, and Language
+# 🤖 Tabero: Learning Gentle Manipulation with Closed-Loop Force Feedback from Vision, Touch, and Language
 
 [![ICML 2026](https://img.shields.io/badge/ICML-2026-blue?style=flat-square&logo=google-scholar)](https://arxiv.org/abs/2605.27886)
 [![arXiv](https://img.shields.io/badge/arXiv-2605.27886-b31b1b?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2605.27886)
@@ -13,7 +11,7 @@
 [![Isaac Sim](https://img.shields.io/badge/Isaac%20Sim-5.0%2B-orange?style=flat-square&logo=nvidia)](https://developer.nvidia.com/isaac-sim)
 [![Isaac Lab](https://img.shields.io/badge/Isaac%20Lab-2.2%2B-red?style=flat-square)](https://isaac-sim.github.io/IsaacLab/)
 [![Code](https://img.shields.io/badge/Code-GitHub-black?style=flat-square&logo=github)](https://github.com/NathanWu7/Tabero-VTLA)
-[![Dataset](https://img.shields.io/badge/Dataset-Zenodo-purple?style=flat-square&logo=zenodo)](https://zenodo.org/records/19250783)
+[![Dataset](https://img.shields.io/badge/Dataset-Hugging%20Face-yellow?style=flat-square&logo=huggingface)](https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero)
 
 [📄 Paper](https://arxiv.org/abs/2605.27886) •
 [📦 Assets](https://huggingface.co/datasets/NathanWu7/Isaaclab_Libero) •
@@ -51,22 +49,22 @@ Tabero-VTLA modulates grip force according to natural language instructions. Wat
 </td>
 <td width="50%" align="center">
   <img src="docs/assets/task1_gentle_failure.gif" width="100%" alt="Gentle Failure"/><br/>
-  <sub>🟡 <b>Failure Case</b> — Extreme low-force (10%): object slips due to insufficient grip, illustrating the gentleness-reliability trade-off</sub>
+  <sub>🟡 <b>Failure Case</b> Illustrating the gentleness-reliability trade-off</sub>
 </td>
 </tr>
 </table>
 
-### 🍮 Task 7: Pick up the chocolate pudding → Place in basket
+### 🍮 Task 7: Pick up the milk → Place in basket
 
 <table>
 <tr>
 <td width="50%" align="center">
   <img src="docs/assets/task7_firm_success.gif" width="100%" alt="Firm Success"/><br/>
-  <sub>🔴 <b>Firm</b> — "Tightly pick up the chocolate pudding and place it in the basket."<br/>Standard force level applied ✓</sub>
+  <sub>🔴 <b>Firm</b> — "Tightly pick up the milk and place it in the basket."<br/>Standard force level applied ✓</sub>
 </td>
 <td width="50%" align="center">
   <img src="docs/assets/task7_gentle_success.gif" width="100%" alt="Gentle Success"/><br/>
-  <sub>🟢 <b>Gentle</b> — "Softly pick up the chocolate pudding and place it in the basket."<br/>Force reduced by ~70% while maintaining stable grasping ✓</sub>
+  <sub>🟢 <b>Gentle</b> — "Softly pick up the milk and place it in the basket."<br/>Force reduced by ~70% while maintaining stable grasping ✓</sub>
 </td>
 </tr>
 </table>
@@ -149,6 +147,8 @@ huggingface-cli download NathanWu7/pi0_lora_tacfield_tabero \
   --local-dir /path/to/pi0_lora_tacfield_tabero
 
 # Start the model server (from the Tabero-VTLA repository)
+# bash server.sh pi0_lora_tacfield_tabero 49999    #49999 denotes to the training step
+
 # Then run evaluation:
 python benchmarks/openpi/openpi_inference_client.py
 
@@ -236,7 +236,7 @@ Model training code is maintained in the companion repository **[NathanWu7/Taber
 | `Isaac-Libero-Franka-Replay-Camera-ContactForce-v0` | Replay with contact-force observations |
 | `Isaac-Libero-Franka-Hybrid-ContactForce-v0` | Hybrid force-position control with contact force |
 | `Isaac-Libero-Franka-Replay-Camera-Tactile-v0` | Replay with GelSight tactile sensors |
-| `Isaac-Libero-Franka-Hybrid-Tactile-v0` | Hybrid tactile environment |
+| `Isaac-Libero-Franka-Hybrid-Tactile-v0` | Hybrid force-position control with tactile |
 
 ---
 
