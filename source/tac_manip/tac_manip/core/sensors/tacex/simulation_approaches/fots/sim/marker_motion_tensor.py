@@ -116,8 +116,8 @@ class MarkerMotionTensor:
         off_y = yy - cy
         g = torch.exp(-lamb * (off_x * off_x + off_y * off_y))
 
-        rotx = off_x * torch.cos(theta - 1.0) - off_y * torch.sin(theta)
-        roty = off_x * torch.sin(theta) + off_y * torch.cos(theta - 1.0)
+        rotx = off_x * (torch.cos(theta) - 1.0) - off_y * torch.sin(theta)
+        roty = off_x * torch.sin(theta) + off_y * (torch.cos(theta) - 1.0)
 
         dx = rotx * g
         dy = roty * g

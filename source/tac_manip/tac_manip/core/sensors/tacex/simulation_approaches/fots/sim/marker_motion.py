@@ -94,8 +94,8 @@ class MarkerMotion:
 
         g = np.exp(-lamb * (offset_x**2 + offset_y**2))
 
-        rotx = offset_x * np.cos(theta - 1) - offset_y * np.sin(theta)
-        roty = offset_x * np.sin(theta) + offset_y * np.cos(theta - 1)
+        rotx = offset_x * (np.cos(theta) - 1) - offset_y * np.sin(theta)
+        roty = offset_x * np.sin(theta) + offset_y * (np.cos(theta) - 1)
 
         # rotx = offset_x * np.cos(theta) - offset_y * np.sin(theta)
         # roty = offset_x * np.sin(theta) + offset_y * np.cos(theta)
